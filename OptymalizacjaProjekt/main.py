@@ -29,8 +29,10 @@ class FarmSimulation:
 
         for i in range(self.N): # self.Q[self.y][i] -> to musi być jako funkcja bo jakość gleby trzeba by zaokrąglić do intów
             if self.curr_year != 0: self.Q[self.curr_year][i] = self.Q[self.curr_year - 1][i] - self.W[self.X[self.curr_year - 1][i]]
-            self.earnings += (self.Q[self.curr_year][i] * 0.01 * self.G[self.X[self.curr_year][i]]) - self.C[self.X[self.curr_year][i]] * self.P - self.D[i] * self.T
-            self.curr_year += 1
+            income = (self.Q[self.curr_year][i] * 0.01 * self.P * self.G[self.X[self.curr_year][i]])
+            expense = (self.C[self.X[self.curr_year][i]] * self.P + self.D[i] * self.T)
+            self.earnings += income - expense
+        self.curr_year += 1
             # print(i, self.curr_year)
 
     def simulate_farm(self, decision_matrix_X: list[list]): # Funkcja celu
