@@ -91,10 +91,13 @@ class FarmSimulation:
             dec = []
             for no_field in range(self.N):
                 pred_qual = self.Q[0][no_field] if y_dec == 0 else self.Q[self.curr_year - 1][no_field] - self.W[self.X[self.curr_year - 1][no_field]]
-                best_plant, best_income = 'EMPTY', 0
+                best_plant, best_income = 'NONE', 0
                 for plant in plant_list:
                     if 0 <= (pred_qual - self.W[plant]) <= 100:
-                        plant_inc = (self.P[no_field] * self.G[self.S[plant]][math.ceil(pred_qual)]) - (self.C[plant] * self.P[no_field] + self.D[no_field] * self.T)
+                        if plant != "EMPTY":
+                            plant_inc = (self.P[no_field] * self.G[self.S[plant]][math.ceil(pred_qual)]) - (self.C[plant] * self.P[no_field] + self.D[no_field] * self.T)
+                        else:
+                            plant_inc = (self.P[no_field] * self.G[self.S[plant]][math.ceil(pred_qual)])
                         if plant_inc > best_income:
                             best_plant, best_income = plant, plant_inc
                 dec.append(best_plant)
@@ -127,17 +130,17 @@ def main():
         if i < 12:
             row_potato.append(0)
         else:
-            row_potato.append((math.e ** ((i - 12) / 10)/6002.91 * 16 + 24) * 700 + 558+1761.46)
+            row_potato.append((math.e ** ((i - 12) / 10)/6002.91 * 17 + 24) * 710 + 558+1761.46)
     G.append(row_potato)
 
     for i in range(100):
         if i < 35:
                 row_wheat.append(0)
         else:
-            row_wheat.append((math.e**((i-35)/10)/601.845*8+3.84)*1450+558)
+            row_wheat.append((math.e**((i-35)/10)/601.845*10+3.9)*1490+558)
     G.append(row_wheat)
     for i in range(100):
-            row_rye.append((math.e**(i/10)/19930.4*6+3)*1120+558)
+            row_rye.append((math.e**(i/10)/19930.4*6+3)*1150+558)
     G.append(row_rye)
     for i in range(100):
         if i < 17:
