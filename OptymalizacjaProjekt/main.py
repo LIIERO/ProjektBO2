@@ -9,7 +9,7 @@ Plant = NewType('Plant', str)
 Earnings = NewType('Earnings', dict)
 Degradation = NewType('Degradation', dict)
 
-plant_list = ['potato', 'wheat', 'rye', 'EMPTY'] # Empty - zostaw pole puste
+plant_list = ['potato', 'wheat', 'rye', 'triticale', 'EMPTY'] # Empty - zostaw pole puste
 MQ = 100 # Maksymalna jakość gleby
 
 
