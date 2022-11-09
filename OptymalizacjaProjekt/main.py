@@ -8,7 +8,7 @@ Plant = NewType('Plant', str)
 Earnings = NewType('Earnings', dict)
 Degradation = NewType('Degradation', dict)
 
-plant_list = ['potato', 'wheat', 'rye', 'triticale', 'EMPTY']
+PLANTS = ('potato', 'wheat', 'rye', 'triticale', 'EMPTY')
 MQ = 100 # Maksymalna jakość gleby
 
 class FarmSimulation:
@@ -54,7 +54,7 @@ class FarmSimulation:
         self.X.append(yearly_decision)
         for i in range(self.N):
             if self.curr_year != 0: self.Q[self.curr_year][i] = self.Q[self.curr_year - 1][i] - self.W[self.X[self.curr_year - 1][i]]
-            plant = self.X[self.curr_year][i] # Roślina którą się aktualnie zajmujemy
+            plant = self.X[self.curr_year][i]
 
             income = (self.P[i] * self.G[plant][math.ceil(self.Q[self.curr_year][i])])
             expense = 0 if plant == 'EMPTY' else (self.C[plant] * self.P[i] + self.D[i] * self.T) # Jeśli nic nie siejemy to nie ponosimy kosztów
@@ -75,7 +75,7 @@ class FarmSimulation:
             for no_field in range(self.N):
                 pred_qual = self.Q[0][no_field] if y_dec == 0 else self.Q[self.curr_year - 1][no_field] - self.W[self.X[self.curr_year - 1][no_field]]
                 best_plant, best_income = 'NONE', 0
-                for plant in plant_list:
+                for plant in PLANTS:
                     if 0 <= (pred_qual - self.W[plant]) <= MQ:
                         if plant != "EMPTY":
                             plant_inc = (self.P[no_field] * self.G[plant][math.ceil(pred_qual)]) - (self.C[plant] * self.P[no_field] + self.D[no_field] * self.T)
@@ -91,10 +91,7 @@ class FarmSimulation:
 
 def main():
 
-    # Dane które nie zmieniają się dla różnych modeli
-
-    N = 5
-    Y = 5
+    # Dane pozyskane z internetu:
     T = 6/15*8*2*7.546 #spalanie na godzine/predkośc*ile razy trzeba pojechać * 2 * cena paliwa
 
     Cwheat = (87.43+19.76)*2.5 + (87.43+27.56)*2 + (87.43+18.80)*2 + (87.43+31.9)*2.5 + 850 * 1.22 + 366 * 1.22 + 540 + 1458 + 1699 + 148 + 34
@@ -114,7 +111,9 @@ def main():
         G['EMPTY'].append(40)
 
 
-    # Dane które mogą się zmieniać, niezmienne dane do testowania
+    # Dane dowolne:
+    N = 5
+    Y = 5
 
     P = [1.05, 4.14, 1.69, 1.81, 3.66]
     # P = [random.uniform(1, 6) for _ in range(N)]
@@ -123,8 +122,8 @@ def main():
     b = [90, 34, 54, 5, 16] # Początkowe jakości gleb na każdym polu
     # b = random.sample(range(0, MQ), N)
 
-    # Symulacja
 
+    # Symulacja
     f_sim = FarmSimulation(N, Y, T, P, D, C, W, G, b)
 
     X = [['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
@@ -134,7 +133,7 @@ def main():
          ['wheat', 'wheat', 'wheat', 'wheat', 'wheat']]
     f_sim.simulate_farm(X) # Przykład dla samej pszenicy
 
-    # TODO Sprawdzić czemu nie bierze ziemniaków i pszenżyta
+    # Algorytm zachłanny
     f_sim.solve_greedy()
 
 if __name__ == '__main__':
