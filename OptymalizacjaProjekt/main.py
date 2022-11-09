@@ -4,9 +4,9 @@ import math
 import random
 from typing import NewType, Union
 
-Plant = NewType('Plant', str)
+"""Plant = NewType('Plant', str)
 Earnings = NewType('Earnings', dict)
-Degradation = NewType('Degradation', dict)
+Degradation = NewType('Degradation', dict)"""
 
 PLANTS = ('potato', 'wheat', 'rye', 'triticale', 'EMPTY')
 MQ = 100 # Maksymalna jakość gleby
@@ -51,15 +51,24 @@ class FarmSimulation:
         print()
 
     def __simulate_year_pass(self, yearly_decision: list[str]):
+        inc_from_empty = True
+        if len(self.X) > 0:
+            for prev, cur in zip(self.X[-1], yearly_decision):
+                if cur != 'EMPTY':
+                    if prev == cur: raise ValueError
+                elif prev == 'EMPTY':
+                    inc_from_empty = False
+
         self.X.append(yearly_decision)
         for i in range(self.N):
             if self.curr_year != 0: self.Q[self.curr_year][i] = self.Q[self.curr_year - 1][i] - self.W[self.X[self.curr_year - 1][i]]
             plant = self.X[self.curr_year][i]
 
-            income = (self.P[i] * self.G[plant][math.ceil(self.Q[self.curr_year][i])])
+            income = (self.P[i] * self.G[plant][math.ceil(self.Q[self.curr_year][i])]) if inc_from_empty else 0
             expense = 0 if plant == 'EMPTY' else (self.C[plant] * self.P[i] + self.D[i] * self.T) # Jeśli nic nie siejemy to nie ponosimy kosztów
 
             self.earnings += income - expense
+            # print(self.Q[self.curr_year][i], plant, income, expense)
         self.curr_year += 1
 
     def simulate_farm(self, decision_matrix_X: list[list]): # Funkcja celu
@@ -74,15 +83,18 @@ class FarmSimulation:
             dec = []
             for no_field in range(self.N):
                 pred_qual = self.Q[0][no_field] if y_dec == 0 else self.Q[self.curr_year - 1][no_field] - self.W[self.X[self.curr_year - 1][no_field]]
-                best_plant, best_income = 'NONE', 0
+                best_plant, best_income = 'NONE', -math.inf
                 for plant in PLANTS:
                     if 0 <= (pred_qual - self.W[plant]) <= MQ:
-                        if plant != "EMPTY":
-                            plant_inc = (self.P[no_field] * self.G[plant][math.ceil(pred_qual)]) - (self.C[plant] * self.P[no_field] + self.D[no_field] * self.T)
-                        else:
+                        if plant == 'EMPTY':
                             plant_inc = (self.P[no_field] * self.G[plant][math.ceil(pred_qual)])
+                            if y_dec > 0 and plant == self.X[y_dec - 1][no_field]: plant_inc = 0
+                        elif y_dec == 0 or (y_dec > 0 and plant != self.X[y_dec - 1][no_field]):
+                            plant_inc = (self.P[no_field] * self.G[plant][math.ceil(pred_qual)]) - (self.C[plant] * self.P[no_field] + self.D[no_field] * self.T)
+                        else: plant_inc = -math.inf
                         if plant_inc > best_income:
                             best_plant, best_income = plant, plant_inc
+
                 dec.append(best_plant)
 
             self.__simulate_year_pass(dec)
@@ -110,7 +122,6 @@ def main():
         G['triticale'].append(0 if i < 17 else (math.e**((i-17)/10)/3640.95*9+3)*1339+558)
         G['EMPTY'].append(40)
 
-
     # Dane dowolne:
     N = 5
     Y = 5
@@ -127,9 +138,9 @@ def main():
     f_sim = FarmSimulation(N, Y, T, P, D, C, W, G, b)
 
     X = [['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
+         ['rye', 'rye', 'rye', 'rye', 'rye'],
          ['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
-         ['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
-         ['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
+         ['rye', 'rye', 'rye', 'rye', 'rye'],
          ['wheat', 'wheat', 'wheat', 'wheat', 'wheat']]
     f_sim.simulate_farm(X) # Przykład dla samej pszenicy
 
