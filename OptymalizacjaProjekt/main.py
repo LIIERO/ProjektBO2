@@ -51,20 +51,21 @@ class FarmSimulation:
         print()
 
     def __simulate_year_pass(self, yearly_decision: list[str]):
-        inc_from_empty = True
         if len(self.X) > 0:
             for prev, cur in zip(self.X[-1], yearly_decision):
                 if cur != 'EMPTY':
                     if prev == cur: raise ValueError
-                elif prev == 'EMPTY':
-                    inc_from_empty = False
 
         self.X.append(yearly_decision)
         for i in range(self.N):
-            if self.curr_year != 0: self.Q[self.curr_year][i] = self.Q[self.curr_year - 1][i] - self.W[self.X[self.curr_year - 1][i]]
             plant = self.X[self.curr_year][i]
+            if self.curr_year != 0:
+                self.Q[self.curr_year][i] = self.Q[self.curr_year - 1][i] - self.W[self.X[self.curr_year - 1][i]]
+                income = 0 if self.X[self.curr_year - 1][i] == plant == 'EMPTY' else (
+                            self.P[i] * self.G[plant][math.ceil(self.Q[self.curr_year][i])])
+            else:
+                income = self.P[i] * self.G[plant][math.ceil(self.Q[self.curr_year][i])]
 
-            income = (self.P[i] * self.G[plant][math.ceil(self.Q[self.curr_year][i])]) if inc_from_empty else 0
             expense = 0 if plant == 'EMPTY' else (self.C[plant] * self.P[i] + self.D[i] * self.T) # Jeśli nic nie siejemy to nie ponosimy kosztów
 
             self.earnings += income - expense
@@ -80,6 +81,8 @@ class FarmSimulation:
     def solve_greedy(self): # Algorytm zachłanny - w każdym roku bierze to co da w nim największy zarobek
         self.__reset_variables()
         for y_dec in range(self.Y):
+            if y_dec > 2:
+                a =4;
             dec = []
             for no_field in range(self.N):
                 pred_qual = self.Q[0][no_field] if y_dec == 0 else self.Q[self.curr_year - 1][no_field] - self.W[self.X[self.curr_year - 1][no_field]]
@@ -146,6 +149,10 @@ def main():
 
     # Algorytm zachłanny
     f_sim.solve_greedy()
+
+
+
+
 
 if __name__ == '__main__':
     main()
