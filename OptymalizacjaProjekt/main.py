@@ -138,7 +138,7 @@ class FarmSimulation:
             self.__simulate_year_pass(dec)
         return self.decisionMatrix
 
-    def simulated_annealing(self, s0: list[list], k_max):
+    def simulated_annealing(self, s0: list[list], k_max): # Symulowane wyżarzanie
         self.__reset_variables()
 
         s = deepcopy(s0) # Rozwiązanie początkowe
@@ -170,7 +170,6 @@ class FarmSimulation:
         # Zabezpieczenie przed wybraniem niedozwolonego rozwiązania
         # if rand_plant != 'EMPTY':
             # if (year > 0 and s_inp[year - 1][field] == rand_plant) or (year < self.yearsNumber-1 and s_inp[year + 1][field] == rand_plant):
-
         try:
             self.simulate_farm(s_out)
         except IndexError:
