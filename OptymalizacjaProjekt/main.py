@@ -143,7 +143,7 @@ class FarmSimulation:
 
         s = deepcopy(s0) # Rozwiązanie początkowe
         for k in range(k_max):
-            T = self.__annealing_temp(1 - ((k + 1) / k_max))
+            T = self.__annealing_temp(1 - ((k + 1) / k_max), k_max)
             s_new = self.__annealing_neig(s)
             if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
                 s = deepcopy(s_new)
@@ -151,11 +151,11 @@ class FarmSimulation:
         return s
 
     @staticmethod
-    def __annealing_temp(inp): # Funkcja obliczająca temperaturę
+    def __annealing_temp(inp, k_m): # Funkcja obliczająca temperaturę
         if inp > 0:
             return inp # Najprostszy sposób
         else:
-            return 0.01
+            return 1/k_m
 
     def __annealing_neig(self, s_inp): # Funkcja wyznaczająca sąsiednie rozwiązanie
 
