@@ -2,12 +2,13 @@ import numpy as np
 import math
 import random
 from typing import NewType, Union
+from copy import deepcopy
 
 """Plant = NewType('Plant', str)
 Earnings = NewType('Earnings', dict)
 Degradation = NewType('Degradation', dict)"""
 
-PLANTS = ('potato', 'wheat', 'rye', 'triticale', 'EMPTY')
+PLANTS = ['potato', 'wheat', 'rye', 'triticale', 'EMPTY']
 MQ = 100  # Maksymalna jakość gleby
 
 
@@ -54,7 +55,7 @@ class FarmSimulation:
         self.Q = [self.b] + [[None] * self.fieldNumber for _ in range(self.yearsNumber - 1)]
         self.decisionMatrix = []
 
-    def __display_solution(self):
+    def display_solution(self):
         print('\nRozwiązanie dające dochód {:.2f} zł'.format(self.earnings))
         for row in self.decisionMatrix: print(row)
         print('\nMacierz jakości gleb pól na przestrzeni lat')
@@ -95,7 +96,7 @@ class FarmSimulation:
         for y_dec in decision_matrix_X:
             self.__simulate_year_pass(y_dec)
 
-        self.__display_solution()
+        return self.earnings # Ma zwracać rozwiązanie
 
     def solve_greedy(self):  # Algorytm zachłanny - w każdym roku bierze to co da w nim największy zarobek
         self.__reset_variables()
@@ -135,28 +136,56 @@ class FarmSimulation:
                 dec.append(best_plant)
 
             self.__simulate_year_pass(dec)
-        self.__display_solution()
+        return self.decisionMatrix
 
-    def simulated_annealing(self, s0: list[list]):
+    def simulated_annealing(self, s0: list[list], k_max):
         self.__reset_variables()
-        k_max = 1000 # Maksymalna liczba iteracji
 
-        s = s0 # Rozwiązanie początkowe
+        s = deepcopy(s0) # Rozwiązanie początkowe
         for k in range(k_max):
             T = self.__annealing_temp(1 - ((k + 1) / k_max))
             s_new = self.__annealing_neig(s)
-            if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
-                s = s_new
 
-        self.__display_solution()
+            '''print()
+            for row in s_new:
+                print(row)'''
+
+            if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
+                s = deepcopy(s_new)
+
         return s
 
-
-    def __annealing_temp(self, inp): # Funkcja obliczająca temperaturę
-        raise NotImplementedError
+    @staticmethod
+    def __annealing_temp(inp): # Funkcja obliczająca temperaturę
+        if inp > 0:
+            return inp # Najprostszy sposób
+        else:
+            return 0.01
 
     def __annealing_neig(self, s_inp): # Funkcja wyznaczająca sąsiednie rozwiązanie
-        raise NotImplementedError
+
+        year = random.randrange(self.yearsNumber)
+        field = random.randrange(self.fieldNumber)
+        curr_plant = s_inp[year][field]
+        rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant])
+
+        s_out = deepcopy(s_inp)
+        s_out[year][field] = rand_plant
+
+        # Zabezpieczenie przed wybraniem niedozwolonego rozwiązania
+        # if rand_plant != 'EMPTY':
+            # if (year > 0 and s_inp[year - 1][field] == rand_plant) or (year < self.yearsNumber-1 and s_inp[year + 1][field] == rand_plant):
+
+        try:
+            self.simulate_farm(s_out)
+        except IndexError:
+            # print('Nie spełnia ograniczenia jakości')
+            return self.__annealing_neig(s_inp) # Ponowna próba
+        except ValueError:
+            # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
+            return self.__annealing_neig(s_inp) # Ponowna próba
+
+        return s_out
 
     @staticmethod
     def __annealing_P(e, e_dash, temp): # Funkcja akceptująca rozwiązanie, zmodyfikowana bo maksymalizujemy
@@ -206,10 +235,27 @@ def main():
          ['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
          ['rye', 'rye', 'rye', 'rye', 'rye'],
          ['wheat', 'wheat', 'wheat', 'wheat', 'wheat']]
+    print('Przykład')
     f_sim.simulate_farm(X)  # Przykład dla samej pszenicy
+    f_sim.display_solution()
 
     # Algorytm zachłanny
-    f_sim.solve_greedy()
+    print('Rozwiązanie algorytmu zachłannego')
+    greedy_s = f_sim.solve_greedy()
+    f_sim.display_solution()
+
+    # Wyżarzanie
+    iterations = 1000  # Maksymalna liczba iteracji
+
+    print('Wyżarzanie dla rozwiązania począkowego zachłannego')
+    sol = f_sim.simulated_annealing(greedy_s, iterations)
+    f_sim.simulate_farm(sol)
+    f_sim.display_solution()
+
+    print('Wyżarzanie dla rozwiązania począkowego przykładowego')
+    sol = f_sim.simulated_annealing(X, iterations)
+    f_sim.simulate_farm(sol)
+    f_sim.display_solution()
 
 
 if __name__ == '__main__':
