@@ -1,4 +1,4 @@
-# import numpy as np
+import numpy as np
 import math
 import random
 from typing import NewType, Union
@@ -136,6 +136,33 @@ class FarmSimulation:
 
             self.__simulate_year_pass(dec)
         self.__display_solution()
+
+    def simulated_annealing(self, s0: list[list]):
+        self.__reset_variables()
+        k_max = 1000 # Maksymalna liczba iteracji
+
+        s = s0 # Rozwiązanie początkowe
+        for k in range(k_max):
+            T = self.__annealing_temp(1 - ((k + 1) / k_max))
+            s_new = self.__annealing_neig(s)
+            if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
+                s = s_new
+
+        self.__display_solution()
+        return s
+
+
+    def __annealing_temp(self, inp): # Funkcja obliczająca temperaturę
+        raise NotImplementedError
+
+    def __annealing_neig(self, s_inp): # Funkcja wyznaczająca sąsiednie rozwiązanie
+        raise NotImplementedError
+
+    @staticmethod
+    def __annealing_P(e, e_dash, temp): # Funkcja akceptująca rozwiązanie, zmodyfikowana bo maksymalizujemy
+        if e_dash > e: return 1
+        else: return np.exp(((-1)*(e - e_dash))/temp)
+
 
 
 def main():
