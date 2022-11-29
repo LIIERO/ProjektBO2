@@ -145,11 +145,6 @@ class FarmSimulation:
         for k in range(k_max):
             T = self.__annealing_temp(1 - ((k + 1) / k_max))
             s_new = self.__annealing_neig(s)
-
-            '''print()
-            for row in s_new:
-                print(row)'''
-
             if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
                 s = deepcopy(s_new)
 
