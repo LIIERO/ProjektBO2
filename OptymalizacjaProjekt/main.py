@@ -138,29 +138,39 @@ class FarmSimulation:
             self.__simulate_year_pass(dec)
         return self.decisionMatrix
 
-    def simulated_annealing(self, s0: list[list], k_max): # Symulowane wyżarzanie
+    def simulated_annealing(self, s0: list[list], k_max, stages): # Symulowane wyżarzanie
         self.__reset_variables()
-
+        beast_s = deepcopy(s0) # Rozwiązanie najlepsze
         s = deepcopy(s0) # Rozwiązanie początkowe
-        for k in range(k_max):
-            T = self.__annealing_temp(1 - ((k + 1) / k_max), k_max)
-            s_new = self.__annealing_neig(s)
-            if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
-                s = deepcopy(s_new)
 
-        return s
+        for k in range(k_max):
+            if k_max >= 0.99**k:
+                year = random.randrange(self.yearsNumber)
+                field = random.randrange(self.fieldNumber)
+                T = self.__annealing_temp(k, k_max)
+                for _ in range(stages):
+                    s_new = self.__annealing_neig(s, k_max, T, year, field)
+                    if self.simulate_farm(s_new[0]) > self.simulate_farm(beast_s):
+                        beast_s = s_new[0]
+                    if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new[0]), T) >= random.uniform(0, 1):
+                        s = deepcopy(s_new[0])
+                        year = s_new[1]
+                        field = s_new[2]
+            else:
+                break
+
+        return beast_s
 
     @staticmethod
     def __annealing_temp(inp, k_m): # Funkcja obliczająca temperaturę
-        if inp > 0:
-            return inp # Najprostszy sposób
-        else:
-            return 1/k_m
+        return k_m * 0.99**inp # Najprostszy sposób
 
-    def __annealing_neig(self, s_inp): # Funkcja wyznaczająca sąsiednie rozwiązanie
 
-        year = random.randrange(self.yearsNumber)
-        field = random.randrange(self.fieldNumber)
+    def __annealing_neig(self, s_inp, k_m, T, last_year, last_field): # Funkcja wyznaczająca sąsiednie rozwiązanie
+        range_year = self.__range_builder(last_year-T*self.yearsNumber/(2*k_m), last_year+T*self.yearsNumber/(2*k_m), self.yearsNumber)
+        range_field = self.__range_builder(last_field-T*self.fieldNumber/(2*k_m), last_field+T*self.fieldNumber/(2*k_m), self.fieldNumber)
+        year = random.randrange(range_year[0], range_year[1])
+        field = random.randrange(range_field[0], range_field[1])
         curr_plant = s_inp[year][field]
         rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant])
 
@@ -174,17 +184,33 @@ class FarmSimulation:
             self.simulate_farm(s_out)
         except IndexError:
             # print('Nie spełnia ograniczenia jakości')
-            return self.__annealing_neig(s_inp) # Ponowna próba
+            return self.__annealing_neig(s_inp, k_m, T, last_year, last_field) # Ponowna próba
         except ValueError:
             # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
-            return self.__annealing_neig(s_inp) # Ponowna próba
+            return self.__annealing_neig(s_inp, k_m, T, last_year, last_field) # Ponowna próba
 
-        return s_out
+        return s_out, year, field
+
+    def __range_builder(self, lower, higher, max_number):
+        lower = int(lower)
+        higher = int(higher)
+        if lower == higher:
+            lower -= 1
+            higher += 1
+        if lower < 0:
+            lower = 0
+        if higher > max_number:
+            higher = max_number
+
+        return [lower, higher]
 
     @staticmethod
     def __annealing_P(e, e_dash, temp): # Funkcja akceptująca rozwiązanie, zmodyfikowana bo maksymalizujemy
-        if e_dash > e: return 1
-        else: return np.exp(((-1)*(e - e_dash))/temp)
+        if e_dash > e:
+            return 1
+
+        else:
+            return np.exp(((-1)*(e - e_dash))/temp)
 
 
 
@@ -242,12 +268,12 @@ def main():
     iterations = 1000  # Maksymalna liczba iteracji
 
     print('Wyżarzanie dla rozwiązania począkowego zachłannego')
-    sol = f_sim.simulated_annealing(greedy_s, iterations)
+    sol = f_sim.simulated_annealing(greedy_s, iterations, 3)
     f_sim.simulate_farm(sol)
     f_sim.display_solution()
 
     print('Wyżarzanie dla rozwiązania począkowego przykładowego')
-    sol = f_sim.simulated_annealing(X, iterations)
+    sol = f_sim.simulated_annealing(X, iterations, 3)
     f_sim.simulate_farm(sol)
     f_sim.display_solution()
 
