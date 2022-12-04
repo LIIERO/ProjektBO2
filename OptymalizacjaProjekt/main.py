@@ -77,6 +77,8 @@ class FarmSimulation:
             if self.curr_year != 0:
                 self.Q[self.curr_year][i] = self.Q[self.curr_year - 1][i] - self.plantInfluenceDict[
                     self.decisionMatrix[self.curr_year - 1][i]]
+                if self.Q[self.curr_year][i] < 0:
+                    raise IndexError
                 income = 0 if self.decisionMatrix[self.curr_year - 1][i] == plant == 'EMPTY' else (
                         self.fieldsSurfacesList[i] * self.earningsMatrix[plant][math.ceil(self.Q[self.curr_year][i])])
             else:
@@ -87,7 +89,7 @@ class FarmSimulation:
                     i] * self.transportCost)  # Jeśli nic nie siejemy to nie ponosimy kosztów
 
             self.earnings += income - expense
-            # print(self.Q[self.curr_year][i], plant, income, expense)
+
         self.curr_year += 1
 
     def simulate_farm(self, decision_matrix_X: list[list]):  # Funkcja celu
@@ -101,8 +103,6 @@ class FarmSimulation:
     def solve_greedy(self):  # Algorytm zachłanny - w każdym roku bierze to co da w nim największy zarobek
         self.__reset_variables()
         for y_dec in range(self.yearsNumber):
-            if y_dec > 2:
-                a = 4
 
             dec = []
             for no_field in range(self.fieldNumber):
@@ -141,14 +141,17 @@ class FarmSimulation:
     def simulated_annealing(self, s0: list[list], k_max): # Symulowane wyżarzanie
         self.__reset_variables()
 
-        s = deepcopy(s0) # Rozwiązanie początkowe
+        beast_s = deepcopy(s0)  # Rozwiązanie najlepsze
+        s = deepcopy(s0)  # Rozwiązanie początkowe
         for k in range(k_max):
             T = self.__annealing_temp(1 - ((k + 1) / k_max), k_max)
             s_new = self.__annealing_neig(s)
+            if self.simulate_farm(s_new) > self.simulate_farm(beast_s):
+                beast_s = s_new
             if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
                 s = deepcopy(s_new)
 
-        return s
+        return beast_s
 
     @staticmethod
     def __annealing_temp(inp, k_m): # Funkcja obliczająca temperaturę
@@ -224,14 +227,14 @@ def main():
     # Symulacja
     f_sim = FarmSimulation(N, Y, T, P, D, C, W, G, b)
 
-    X = [['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
-         ['rye', 'rye', 'rye', 'rye', 'rye'],
-         ['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
-         ['rye', 'rye', 'rye', 'rye', 'rye'],
-         ['wheat', 'wheat', 'wheat', 'wheat', 'wheat']]
-    print('Przykład')
-    f_sim.simulate_farm(X)  # Przykład dla samej pszenicy
-    f_sim.display_solution()
+    # X = [['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
+    #      ['rye', 'rye', 'rye', 'rye', 'rye'],
+    #      ['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
+    #      ['rye', 'rye', 'rye', 'rye', 'rye'],
+    #      ['wheat', 'wheat', 'wheat', 'wheat', 'wheat']]
+    # print('Przykład')
+    # f_sim.simulate_farm(X)  # Przykład dla samej pszenicy
+    # f_sim.display_solution()
 
     # Algorytm zachłanny
     print('Rozwiązanie algorytmu zachłannego')
@@ -246,10 +249,10 @@ def main():
     f_sim.simulate_farm(sol)
     f_sim.display_solution()
 
-    print('Wyżarzanie dla rozwiązania począkowego przykładowego')
-    sol = f_sim.simulated_annealing(X, iterations)
-    f_sim.simulate_farm(sol)
-    f_sim.display_solution()
+    # print('Wyżarzanie dla rozwiązania począkowego przykładowego')
+    # sol = f_sim.simulated_annealing(X, iterations)
+    # f_sim.simulate_farm(sol)
+    # f_sim.display_solution()
 
 
 if __name__ == '__main__':
