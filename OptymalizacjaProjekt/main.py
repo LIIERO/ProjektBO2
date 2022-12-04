@@ -172,8 +172,12 @@ class FarmSimulation:
         year = random.randrange(range_year[0], range_year[1])
         field = random.randrange(range_field[0], range_field[1])
         curr_plant = s_inp[year][field]
-        p = [plant for plant in PLANTS if plant != curr_plant]
-        rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant])
+        self.simulate_farm(s_inp)
+
+        rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant or plant == "EMPTY"])
+        if year > 0:
+            while (self.Q[year - 1][field] - self.plantInfluenceDict[rand_plant]) < 0:
+                rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant or plant == "EMPTY"])
 
         s_out = deepcopy(s_inp)
         s_out[year][field] = rand_plant
@@ -266,7 +270,7 @@ def main():
     f_sim.display_solution()
 
     # Wyżarzanie
-    iterations = 100  # Maksymalna liczba iteracji
+    iterations = 1000  # Maksymalna liczba iteracji
 
     print('Wyżarzanie dla rozwiązania począkowego zachłannego')
     sol = f_sim.simulated_annealing(greedy_s, iterations, 3)
