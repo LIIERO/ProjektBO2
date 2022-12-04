@@ -77,6 +77,8 @@ class FarmSimulation:
             if self.curr_year != 0:
                 self.Q[self.curr_year][i] = self.Q[self.curr_year - 1][i] - self.plantInfluenceDict[
                     self.decisionMatrix[self.curr_year - 1][i]]
+                if self.Q[self.curr_year][i] < 0:
+                    raise IndexError
                 income = 0 if self.decisionMatrix[self.curr_year - 1][i] == plant == 'EMPTY' else (
                         self.fieldsSurfacesList[i] * self.earningsMatrix[plant][math.ceil(self.Q[self.curr_year][i])])
             else:
@@ -101,8 +103,6 @@ class FarmSimulation:
     def solve_greedy(self):  # Algorytm zachłanny - w każdym roku bierze to co da w nim największy zarobek
         self.__reset_variables()
         for y_dec in range(self.yearsNumber):
-            if y_dec > 2:
-                a = 4
 
             dec = []
             for no_field in range(self.fieldNumber):
@@ -172,6 +172,7 @@ class FarmSimulation:
         year = random.randrange(range_year[0], range_year[1])
         field = random.randrange(range_field[0], range_field[1])
         curr_plant = s_inp[year][field]
+        p = [plant for plant in PLANTS if plant != curr_plant]
         rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant])
 
         s_out = deepcopy(s_inp)
@@ -255,9 +256,9 @@ def main():
          ['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
          ['rye', 'rye', 'rye', 'rye', 'rye'],
          ['wheat', 'wheat', 'wheat', 'wheat', 'wheat']]
-    print('Przykład')
-    f_sim.simulate_farm(X)  # Przykład dla samej pszenicy
-    f_sim.display_solution()
+    # print('Przykład')
+    # f_sim.simulate_farm(X)  # Przykład dla samej pszenicy
+    # f_sim.display_solution()
 
     # Algorytm zachłanny
     print('Rozwiązanie algorytmu zachłannego')
@@ -265,17 +266,17 @@ def main():
     f_sim.display_solution()
 
     # Wyżarzanie
-    iterations = 1000  # Maksymalna liczba iteracji
+    iterations = 100  # Maksymalna liczba iteracji
 
     print('Wyżarzanie dla rozwiązania począkowego zachłannego')
     sol = f_sim.simulated_annealing(greedy_s, iterations, 3)
     f_sim.simulate_farm(sol)
     f_sim.display_solution()
 
-    print('Wyżarzanie dla rozwiązania począkowego przykładowego')
-    sol = f_sim.simulated_annealing(X, iterations, 3)
-    f_sim.simulate_farm(sol)
-    f_sim.display_solution()
+    # print('Wyżarzanie dla rozwiązania począkowego przykładowego')
+    # sol = f_sim.simulated_annealing(X, iterations, 3)
+    # f_sim.simulate_farm(sol)
+    # f_sim.display_solution()
 
 
 if __name__ == '__main__':
