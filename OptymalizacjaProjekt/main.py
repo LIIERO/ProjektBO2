@@ -266,24 +266,24 @@ def main():
     # f_sim.display_solution()
 
     # Algorytm zachłanny
-    # print('Rozwiązanie algorytmu zachłannego')
-    # greedy_s = f_sim.solve_greedy()
-    # f_sim.display_solution()
+    print('Rozwiązanie algorytmu zachłannego')
+    greedy_s = f_sim.solve_greedy()
+    f_sim.display_solution()
 
     # Wyżarzanie
     iterations = 1000  # Maksymalna liczba iteracji
 
-    # print('Wyżarzanie dla rozwiązania począkowego zachłannego')
-    # sol = f_sim.simulated_annealing(greedy_s, iterations, 3)
-    # f_sim.simulate_farm(sol)
-    # f_sim.display_solution()
+    print('Wyżarzanie dla rozwiązania począkowego zachłannego')
+    sol = f_sim.simulated_annealing(greedy_s, iterations, 3)
+    f_sim.simulate_farm(sol)
+    f_sim.display_solution()
 
     # print('Wyżarzanie dla rozwiązania począkowego przykładowego')
     # sol = f_sim.simulated_annealing(X, iterations, 3)
     # f_sim.simulate_farm(sol)
     # f_sim.display_solution()
-
-    genetic_algorithm.genetic_algorithm(f_sim, PLANTS)
+    genetic_algorithm.genetic_algorithm(f_sim, PLANTS, "roulette")
+    genetic_algorithm.genetic_algorithm(f_sim, PLANTS, "rank")
 
 
 if __name__ == '__main__':
