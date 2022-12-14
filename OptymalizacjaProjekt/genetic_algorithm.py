@@ -83,80 +83,109 @@ class Genetic(object):
             chromosome_probab = [i[-1] / sum_earnings for i in
                                  self.chromosome]  # szansa na wylosowanie danego chromosomu w ruletce
         chromosomes = deepcopy([i[:-1] for i in self.chromosome])
-        parent_index = np.random.choice(len(chromosomes), 2,
-                                        p=chromosome_probab)  # wyselekcjowanie dwóch rodziców za pomocą ruletki
-        return chromosomes[parent_index[0]], chromosomes[parent_index[1]]
+        parent_index = []
+        for m in range(len(self.chromosome)//2):
+            parent_index.append(list(np.random.choice(len(chromosomes), 2,
+                                            p=chromosome_probab))) # wyselekcjowanie rodziców za pomocą ruletki
+        parent_index = [item for k in parent_index for item in k]
+        parent = [chromosomes[k] for k in parent_index]
+        return parent
 
-    def crossover(self, selection):  # procedura krzyżowania
+    def crossover(self, selection, selection_type):  # procedura krzyżowania
         sel = deepcopy(selection)
         flag = False
-        while not flag:
+        children = []
+        if selection_type == "rank":
             sel_out = deepcopy(sel)
-            flag = True
-            k = np.random.randint(0, len(sel_out[0]), 2)
-            k = sorted(k)
-            for i in range(k[0], k[1]):
-                sel_out[0][i], sel_out[1][i] = sel_out[0][i], sel_out[1][i]
-            try:
-                self.__simulate_one_field(sel_out[0])
-                self.__simulate_one_field(sel_out[1])
-            except IndexError:
-                # print('Nie spełnia ograniczenia jakości')
-                flag = False  # Ponowna próba
+            for chromosome_number in range(len(self.chromosome)):
+                while not flag:
+                        flag = True
+                        k = np.random.randint(0, len(sel_out[0]), 2)
+                        k = sorted(k)
+                        for i in range(k[0], k[1]):
+                            sel_out[0][i], sel_out[1][i] = sel_out[0][i], sel_out[1][i]
+                        try:
+                            self.__simulate_one_field(sel_out[0])
+                            self.__simulate_one_field(sel_out[1])
+                        except IndexError:
+                            # print('Nie spełnia ograniczenia jakości')
+                            flag = False  # Ponowna próba
 
-            except ValueError:
-                # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
-                flag = False  # Ponowna próba
+                        except ValueError:
+                            # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
+                            flag = False  # Ponowna próba
 
-            if flag:
-                sel = deepcopy(sel_out)
+                        if flag:
+                            children.append(deepcopy(sel_out))
+        elif selection_type == "roulette":
+            sel_out = deepcopy(sel)
+            for m in range(len(sel_out) // 2):
+                while not flag:
+                    flag = True
+                    children = []
+                    k = np.random.randint(0, len(sel_out[0][:-1]), 2)
+                    k = sorted(k)
+                    for i in range(k[0], k[1]):
+                        sel_out[2*m][i], sel_out[2*m+1][i] = sel_out[2*m][i], sel_out[2*m+1][i]
+                    try:
+                        self.__simulate_one_field(sel_out[2*m])
+                        self.__simulate_one_field(sel_out[2*m+1])
+                    except IndexError:
+                        # print('Nie spełnia ograniczenia jakości')
+                        flag = False  # Ponowna próba
+                    except ValueError:
+                        # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
+                        flag = False  # Ponowna próba
+                    if flag:
+                        children.append(deepcopy(sel_out))
 
-        return sel
+        return children
 
     def mutation(self, crossover):
         mutation = deepcopy(crossover)
-        mutation = list(mutation)
-        mutation_out = [mutation[0] if i < 3 else mutation[1] for i in range(6)]
+        mutation_out = list(mutation[0])
         j = 0
         for i in deepcopy(mutation_out):
+
             flag = False
             i_inp = deepcopy(i)
             attempts = 0
-            while not flag:
-                i = deepcopy(i_inp)
-                flag = True
-                year = random.randrange(len(i))
-                curr_plant = i[year]
-                rand_plant = random.choice([plant for plant in self.plants if plant != curr_plant])
-                i[year] = rand_plant
-                if j >= 3:
-                    for l in mutation_out[3:]:  # sprawdzenie czy dany chromosom nie jest już w generacji
+            mutations_for_one_parents = []
+            for m in range(10):
+
+                while not flag:
+                    i = deepcopy(i_inp)
+                    flag = True
+                    year = random.randrange(len(i))
+                    curr_plant = i[year]
+                    rand_plant = random.choice([plant for plant in self.plants if plant != curr_plant])
+                    i[year] = rand_plant
+
+                    for l in mutations_for_one_parents:  # sprawdzenie czy dany chromosom nie jest już w generacji
                         if l[year] == i[year]:
                             flag = False
-                else:
-                    for l in mutation_out[:3]:  # sprawdzenie czy dany chromosom nie jest już w generacji
-                        if l[year] == i[year]:
+                    try:
+                        self.__simulate_one_field(i)
+                    except IndexError:
+                        # print('Nie spełnia ograniczenia jakości')
+                        flag = False  # Ponowna próba
+
+                    except ValueError:
+                        # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
+                        flag = False  # Ponowna próba
+                    if flag:
+                        mut = deepcopy(i)
+                        income = self.__simulate_one_field(i)
+                        if income > 0 or attempts > 10:
+                            mut.append(income)
+                            mutations_for_one_parents.append(mut)
+                        else:
+                            attempts += 1
                             flag = False
+            mutations_for_one_parents.sort(key=lambda x: x[-1])  # sortowanie mutacji
+            mutation_out[j] = deepcopy(mutations_for_one_parents[-1]) #wybranie najlepszej mutacji
+            j += 1
 
-                try:
-                    self.__simulate_one_field(i)
-                except IndexError:
-                    # print('Nie spełnia ograniczenia jakości')
-                    flag = False  # Ponowna próba
-
-                except ValueError:
-                    # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
-                    flag = False  # Ponowna próba
-                if flag:
-                    mut = deepcopy(i)
-                    income = self.__simulate_one_field(i)
-                    if income > 0 or attempts > 10:
-                        mut.append(income)
-                        mutation_out[j] = mut
-                        j += 1
-                    else:
-                        attempts += 1
-                        flag = False
 
         return mutation_out
 
@@ -189,7 +218,7 @@ class Genetic(object):
         return earnings
 
 
-def genetic_algorithm(farm: main.FarmSimulation, plants, selection_type="roulette"):
+def genetic_algorithm(farm: main.FarmSimulation, plants, number_chromosome, selection_type="roulette"):
     greedy_result = farm.solve_greedy()
     j = 0
     farm.earnings = 0
@@ -198,17 +227,19 @@ def genetic_algorithm(farm: main.FarmSimulation, plants, selection_type="roulett
     beast_generation_number = []
     for i in list(zip(*greedy_result[::-1])):
         i = deepcopy(list(i))
-        chromosomes = [i for _ in range(6)]
+        chromosomes = [i for _ in range(number_chromosome)]
         genetic = Genetic(chromosomes, plants, j, farm)
         genetic.initial_result()
-        for generation_number in range(100):
+        for generation_number in range(50):
             if selection_type == "roulette":
                 selection = genetic.selection_roulette(generation_number)
+                children = genetic.crossover(selection, selection_type)
             elif selection_type == "rank":
                 selection = genetic.selection_rank(generation_number)
-            children = genetic.crossover(selection)
+                children = genetic.crossover(selection, selection_type)
             mutation = genetic.mutation(children)
             genetic.chromosome = deepcopy(mutation)
+
 
         max_earnings = max([io[-1] for io in genetic.chromosome])  # maksymalna ocena chromosomu dla ostatniej generacji
         for m in genetic.chromosome:
@@ -222,7 +253,7 @@ def genetic_algorithm(farm: main.FarmSimulation, plants, selection_type="roulett
     genetic_result = [i[:-1] for i in genetic_result]
     genetic_result = zip(*genetic_result[::])
     genetic_result = list(genetic_result)
-    print(f"Wynik z algorytmu genetycznego dla 100 pełnych pokoleń (z metodą selekcji: {selection_type}):")
+    print(f"Wynik z algorytmu genetycznego dla 50 pełnych pokoleń (z metodą selekcji: {selection_type}):")
     farm.simulate_farm(genetic_result)
     farm.display_solution()
 

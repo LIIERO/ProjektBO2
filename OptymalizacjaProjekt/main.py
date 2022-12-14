@@ -282,8 +282,8 @@ def main():
     # sol = f_sim.simulated_annealing(X, iterations, 3)
     # f_sim.simulate_farm(sol)
     # f_sim.display_solution()
-    genetic_algorithm.genetic_algorithm(f_sim, PLANTS, "roulette")
-    genetic_algorithm.genetic_algorithm(f_sim, PLANTS, "rank")
+    genetic_algorithm.genetic_algorithm(f_sim, PLANTS, 11, "roulette")
+    genetic_algorithm.genetic_algorithm(f_sim, PLANTS, 11, "rank")
 
 
 if __name__ == '__main__':
