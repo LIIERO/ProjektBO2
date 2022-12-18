@@ -1,9 +1,14 @@
 import numpy as np
 import math
 import random
-from typing import NewType, Union
+from typing import Union
 from copy import deepcopy
+
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QIcon
+
 import genetic_algorithm
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox
 
 """Plant = NewType('Plant', str)
 Earnings = NewType('Earnings', dict)
@@ -13,7 +18,7 @@ PLANTS = ['potato', 'wheat', 'rye', 'triticale', 'EMPTY']
 MQ = 100  # Maksymalna jakość gleby
 
 
-class FarmSimulation:
+class FarmSimulation(QWidget):
     """
     fieldNumber, N - Liczba dostępnych pól uprawnych.
     yearsNumber, Y - Liczba lat planowania upraw.
@@ -31,7 +36,7 @@ class FarmSimulation:
     """
 
     def __init__(self, N: int, Y: int, T: float, P: list[float], D: list[float], C: dict[str], W: dict[str],
-                 G: dict[str], start_quality: list[int]):
+                 G: dict[str], start_quality: list[int], parent = None):
         # Inicjalizacja stałych modelu, mogą być różne dla różnych modeli ale nie zmieniają się w trakcie symulacji
         self.fieldNumber = N
         self.yearsNumber = Y
@@ -49,6 +54,9 @@ class FarmSimulation:
         # Zerowy rząd pełen początkowych jakości, reszta to zera
         self.Q: list[list[Union[int, None]]] = [self.b] + [[None] * N for _ in range(Y - 1)]
         self.decisionMatrix: list[list[str]] = []
+
+        super().__init__(parent)
+        self.interface()
 
     def __reset_variables(self):  # Funkcja resetująca model do stanu początkowego
         self.curr_year = 0
@@ -162,6 +170,82 @@ class FarmSimulation:
 
         return beast_s
 
+    def interface(self):
+
+        # etykiety
+        label1 = QLabel("Ilość pól:", self)
+        label2 = QLabel("Liczba symulowanych lat:", self)
+        label3 = QLabel("Zysk:", self)
+
+        # przypisanie widgetów do układu tabelarycznego
+        LayoutT = QGridLayout()
+        LayoutT.addWidget(label1, 0, 0)
+        LayoutT.addWidget(label2, 0, 1)
+        LayoutT.addWidget(label3, 0, 2)
+
+        # 1-liniowe pola edycyjne
+        self.fieldEdt = QLineEdit()
+        self.yearEdt = QLineEdit()
+        self.resultEdt = QLineEdit()
+
+        self.resultEdt.readonly = True
+        self.resultEdt.setToolTip('Wpisz wszystkie parametry i wybierz interesujący algorytm...')
+        self.resultEdt.resize(self.resultEdt.sizeHint())
+
+        LayoutT.addWidget(self.fieldEdt, 1, 0)
+        LayoutT.addWidget(self.yearEdt, 1, 1)
+        LayoutT.addWidget(self.resultEdt, 1, 2)
+
+
+        # przyciski
+        greedyBtn = QPushButton("&greedy", self)
+        annealingBtn = QPushButton("&annealing", self)
+        genetic_rouleBtn = QPushButton("&genetic_roule", self)
+        genetic_rankBtn = QPushButton("&genetic_rank", self)
+        endBtn = QPushButton("&end", self)
+        endBtn.resize(endBtn.sizeHint())
+
+        LayoutH = QHBoxLayout()
+        LayoutH.addWidget(greedyBtn)
+        LayoutH.addWidget(annealingBtn)
+        LayoutH.addWidget(genetic_rouleBtn)
+        LayoutH.addWidget(genetic_rankBtn)
+
+        LayoutT.addLayout(LayoutH, 2, 0, 1, 3)
+        LayoutT.addWidget(endBtn, 3, 0, 1, 3)
+
+        # przypisanie utworzonego układu do okna
+        self.setLayout(LayoutT)
+
+        endBtn.clicked.connect(self.end)
+        greedyBtn.clicked.connect(self.greedy)
+        annealingBtn.clicked.connect(self.annealing)
+        genetic_rouleBtn.clicked.connect(self.genetic)
+        genetic_rankBtn.clicked.connect(self.genetic)
+
+        self.setGeometry(50, 50, 300, 100)
+        self.setWindowIcon(QIcon('field.jpg'))
+        self.setWindowTitle("Symulator gospodarstwa")
+        self.show()
+
+    def end(self):
+        self.close()
+    def closeEvent(self, event):
+
+        odp = QMessageBox.question(
+            self, 'Komunikat',
+            "Czy na pewno chcesz wyjść?",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+        if odp == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Escape:
+            self.close()
+
     @staticmethod
     def __annealing_temp(inp, k_m): # Funkcja obliczająca temperaturę
         return k_m * 0.99**inp # Najprostszy sposób
@@ -197,6 +281,8 @@ class FarmSimulation:
 
         return s_out, year, field
 
+
+
     def __range_builder(self, lower, higher, max_number):
         lower = int(lower)
         higher = int(higher)
@@ -218,9 +304,37 @@ class FarmSimulation:
         else:
             return np.exp(((-1)*(e - e_dash))/temp)
 
+    def annealing(self):
+        greedy_s = self.solve_greedy()
+        iterations = 1000 #zmiennić żeby dało się ustawić
+        sol = self.simulated_annealing(greedy_s, iterations, 3)
+        self.simulate_farm(sol)
+
+        self.resultEdt.setText(str(round(self.earnings, 3)))
+
+    def genetic(self):
+
+        sender = self.sender()
+        wynik = ""
+
+        try:
+            if sender.text() == "&genetic_roule":
+                wynik = genetic_algorithm.genetic_algorithm(self, PLANTS, 11, "roulette")
+            elif sender.text() == "&genetic_rank":
+                wynik = genetic_algorithm.genetic_algorithm(self, PLANTS, 11, "rank")
+            self.resultEdt.setText(str(round(wynik, 3)))
+        except ValueError:
+            QMessageBox.warning(self, "Błąd", "Błędne dane", QMessageBox.Ok)
+
+    def greedy(self):
+        self.solve_greedy()
+        self.resultEdt.setText(str(round(self.earnings, 3)))
+
 
 
 def main():
+    import sys
+    app = QApplication(sys.argv)
     # Dane pozyskane z internetu:
     T = 6 / 15 * 8 * 2 * 7.546  # spalanie na godzine/predkośc*ile razy trzeba pojechać * 2 * cena paliwa
 
@@ -254,37 +368,40 @@ def main():
     # b = random.sample(range(0, MQ), N)
 
     # Symulacja
-    f_sim = FarmSimulation(N, Y, T, P, D, C, W, G, b)
 
-    X = [['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
-         ['rye', 'rye', 'rye', 'rye', 'rye'],
-         ['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
-         ['rye', 'rye', 'rye', 'rye', 'rye'],
-         ['wheat', 'wheat', 'wheat', 'wheat', 'wheat']]
-    # print('Przykład')
-    # f_sim.simulate_farm(X)  # Przykład dla samej pszenicy
+    okno = FarmSimulation(N, Y, T, P, D, C, W, G, b)
+    sys.exit(app.exec_())
+
+    # X = [['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
+    #      ['rye', 'rye', 'rye', 'rye', 'rye'],
+    #      ['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
+    #      ['rye', 'rye', 'rye', 'rye', 'rye'],
+    #      ['wheat', 'wheat', 'wheat', 'wheat', 'wheat']]
+    # # print('Przykład')
+    # # f_sim.simulate_farm(X)  # Przykład dla samej pszenicy
+    # # f_sim.display_solution()
+    #
+    # # Algorytm zachłanny
+    # print('Rozwiązanie algorytmu zachłannego')
+    # greedy_s = f_sim.solve_greedy()
     # f_sim.display_solution()
-
-    # Algorytm zachłanny
-    print('Rozwiązanie algorytmu zachłannego')
-    greedy_s = f_sim.solve_greedy()
-    f_sim.display_solution()
-
-    # Wyżarzanie
-    iterations = 1000  # Maksymalna liczba iteracji
-
-    print('Wyżarzanie dla rozwiązania począkowego zachłannego')
-    sol = f_sim.simulated_annealing(greedy_s, iterations, 3)
-    f_sim.simulate_farm(sol)
-    f_sim.display_solution()
-
-    # print('Wyżarzanie dla rozwiązania począkowego przykładowego')
-    # sol = f_sim.simulated_annealing(X, iterations, 3)
+    #
+    # # Wyżarzanie
+    # iterations = 1000  # Maksymalna liczba iteracji
+    #
+    # print('Wyżarzanie dla rozwiązania począkowego zachłannego')
+    # sol = f_sim.simulated_annealing(greedy_s, iterations, 3)
     # f_sim.simulate_farm(sol)
     # f_sim.display_solution()
-    genetic_algorithm.genetic_algorithm(f_sim, PLANTS, 11, "roulette")
-    genetic_algorithm.genetic_algorithm(f_sim, PLANTS, 11, "rank")
+    #
+    # # print('Wyżarzanie dla rozwiązania począkowego przykładowego')
+    # # sol = f_sim.simulated_annealing(X, iterations, 3)
+    # # f_sim.simulate_farm(sol)
+    # # f_sim.display_solution()
+    # genetic_algorithm.genetic_algorithm(f_sim, PLANTS, 11, "roulette")
+    # genetic_algorithm.genetic_algorithm(f_sim, PLANTS, 11, "rank")
 
 
 if __name__ == '__main__':
+
     main()

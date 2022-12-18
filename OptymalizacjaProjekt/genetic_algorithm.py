@@ -263,3 +263,6 @@ def genetic_algorithm(farm: main.FarmSimulation, plants, number_chromosome, sele
     print(f"Najlepszy rozwiązanie który pojawiło się w trakcie trwania algorytmu genetycznego z metodą selekcji: {selection_type} (w {beast_generation_number} generacjach ) :")
     farm.simulate_farm(beast_genetic_result)
     farm.display_solution()
+
+    farm.simulate_farm(genetic_result)
+    return farm.earnings
