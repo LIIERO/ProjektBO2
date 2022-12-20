@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.8.28) (preloaded format=pdflatex 2022.10.15)  20 DEC 2022 20:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.8.28) (preloaded format=pdflatex 2022.10.15)  20 DEC 2022 22:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -466,127 +466,15 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 [1
 
 {C:/Users/barte/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] [2]
-<screens/farm_class.png, id=100, 750.4035pt x 343.2825pt>
-File: screens/farm_class.png Graphic file (type png)
-<use screens/farm_class.png>
-Package pdftex.def Info: screens/farm_class.png  used on input line 113.
-(pdftex.def)             Requested size: 532.06947pt x 243.4075pt.
-
-Overfull \hbox (48.37263pt too wide) in paragraph at lines 113--114
- [][] 
- []
-
-<screens/oznaczenia.png, id=101, 775.09575pt x 272.81924pt>
-File: screens/oznaczenia.png Graphic file (type png)
-<use screens/oznaczenia.png>
-Package pdftex.def Info: screens/oznaczenia.png  used on input line 119.
-(pdftex.def)             Requested size: 483.69684pt x 170.24934pt.
-<screens/funkcje_pom.png, id=102, 601.64775pt x 242.70676pt>
-File: screens/funkcje_pom.png Graphic file (type png)
-<use screens/funkcje_pom.png>
-Package pdftex.def Info: screens/funkcje_pom.png  used on input line 128.
-(pdftex.def)             Requested size: 483.69684pt x 195.12854pt.
-[3 <./screens/farm_class.png> <./screens/oznaczenia.png>]
-<screens/stm_farmy.png, id=109, 498.663pt x 130.086pt>
-File: screens/stm_farmy.png Graphic file (type png)
-<use screens/stm_farmy.png>
-Package pdftex.def Info: screens/stm_farmy.png  used on input line 136.
-(pdftex.def)             Requested size: 483.69684pt x 126.18126pt.
-<screens/greedy.png, id=110, 433.01775pt x 416.757pt>
-File: screens/greedy.png Graphic file (type png)
-<use screens/greedy.png>
-Package pdftex.def Info: screens/greedy.png  used on input line 143.
-(pdftex.def)             Requested size: 483.69684pt x 465.55005pt.
- [4 <./screens/funkcje_pom.png> <./screens/stm_farmy.png>]
-<screens/pseudocode.png, id=117, 338.4645pt x 179.4705pt>
-File: screens/pseudocode.png Graphic file (type png)
-<use screens/pseudocode.png>
-Package pdftex.def Info: screens/pseudocode.png  used on input line 154.
-(pdftex.def)             Requested size: 483.69684pt x 256.49844pt.
- [5 <./screens/greedy.png>]
-<screens/anealing_main.png, id=123, 917.22675pt x 286.671pt>
-File: screens/anealing_main.png Graphic file (type png)
-<use screens/anealing_main.png>
-Package pdftex.def Info: screens/anealing_main.png  used on input line 163.
-(pdftex.def)             Requested size: 483.69684pt x 151.17378pt.
-<screens/anealing_temp.png, id=124, 503.481pt x 128.8815pt>
-File: screens/anealing_temp.png Graphic file (type png)
-<use screens/anealing_temp.png>
-Package pdftex.def Info: screens/anealing_temp.png  used on input line 172.
-(pdftex.def)             Requested size: 483.69684pt x 123.81921pt.
-<screens/anealing_neig.png, id=125, 576.35326pt x 420.3705pt>
-File: screens/anealing_neig.png Graphic file (type png)
-<use screens/anealing_neig.png>
-Package pdftex.def Info: screens/anealing_neig.png  used on input line 181.
-(pdftex.def)             Requested size: 483.69684pt x 352.79451pt.
- [6 <./screens/pseudocode.png> <./screens/anealing_main.png> <./screens/anealin
-g_temp.png>]
-<screens/anealing_Prob.png, id=133, 710.05275pt x 102.98476pt>
-File: screens/anealing_Prob.png Graphic file (type png)
-<use screens/anealing_Prob.png>
-Package pdftex.def Info: screens/anealing_Prob.png  used on input line 190.
-(pdftex.def)             Requested size: 483.69684pt x 70.15598pt.
-<screens/main1.png, id=134, 729.927pt x 611.28375pt>
-File: screens/main1.png Graphic file (type png)
-<use screens/main1.png>
-Package pdftex.def Info: screens/main1.png  used on input line 199.
-(pdftex.def)             Requested size: 483.69684pt x 405.08083pt.
-
-[7 <./screens/anealing_neig.png> <./screens/anealing_Prob.png>]
-<screens/main2.png, id=142, 452.28975pt x 291.489pt>
-File: screens/main2.png Graphic file (type png)
-<use screens/main2.png>
-Package pdftex.def Info: screens/main2.png  used on input line 206.
-(pdftex.def)             Requested size: 483.69684pt x 311.73447pt.
- [8 <./screens/main1.png>]
-<screens/przykłądowe_rozw.png, id=148, 386.04225pt x 595.023pt>
-File: screens/przykłądowe_rozw.png Graphic file (type png)
-<use screens/przykłądowe_rozw.png>
-Package pdftex.def Info: screens/przykłądowe_rozw.png  used on input line 214
-.
-(pdftex.def)             Requested size: 483.69684pt x 745.55647pt.
- [9 <./screens/main2.png>]
-Overfull \vbox (89.5231pt too high) has occurred while \output is active []
-
-
-[10 <./screens/przykłądowe_rozw.png>]
-<screens/mamos_sim_anealing.png, id=159, 953.36176pt x 523.35526pt>
-File: screens/mamos_sim_anealing.png Graphic file (type png)
-<use screens/mamos_sim_anealing.png>
-Package pdftex.def Info: screens/mamos_sim_anealing.png  used on input line 224
-.
-(pdftex.def)             Requested size: 483.69684pt x 265.52611pt.
-<screens/mamos_anealing_neig.png, id=160, 1038.279pt x 591.4095pt>
-File: screens/mamos_anealing_neig.png Graphic file (type png)
-<use screens/mamos_anealing_neig.png>
-Package pdftex.def Info: screens/mamos_anealing_neig.png  used on input line 23
-1.
-(pdftex.def)             Requested size: 483.69684pt x 275.51695pt.
-<screens/mamos_anealing_p_range_builder.png, id=161, 762.4485pt x 448.074pt>
-File: screens/mamos_anealing_p_range_builder.png Graphic file (type png)
-<use screens/mamos_anealing_p_range_builder.png>
-Package pdftex.def Info: screens/mamos_anealing_p_range_builder.png  used on in
-put line 238.
-(pdftex.def)             Requested size: 483.69684pt x 284.25717pt.
- [11 <./screens/mamos_sim_anealing.png> <./screens/mamos_anealing_neig.png>]
-<screens/mamos_rozw.png, id=168, 260.77425pt x 453.49425pt>
-File: screens/mamos_rozw.png Graphic file (type png)
-<use screens/mamos_rozw.png>
-Package pdftex.def Info: screens/mamos_rozw.png  used on input line 245.
-(pdftex.def)             Requested size: 483.69684pt x 841.23474pt.
- [12 <./screens/mamos_anealing_p_range_builder.png>]
-Overfull \vbox (185.20137pt too high) has occurred while \output is active []
-
-
-[13 <./screens/mamos_rozw.png>] [14] (prezentacja.aux)
+[3] (prezentacja.aux)
 Package rerunfilecheck Info: File `prezentacja.out' has not changed.
 (rerunfilecheck)             Checksum: FA334B10B3C79D03F4483AC5C63A8266;1938.
  ) 
 Here is how much of TeX's memory you used:
- 12955 strings out of 475385
- 200593 string characters out of 2793321
+ 12739 strings out of 475385
+ 195184 string characters out of 2793321
  742186 words of memory out of 3000000
- 34088 multiletter control sequences out of 15000+600000
+ 33919 multiletter control sequences out of 15000+600000
  478869 words of font info for 53 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  72i,9n,77p,368b,514s stack positions out of 10000i,1000n,20000p,200000b,80000s
@@ -603,9 +491,9 @@ e1/public/amsfonts/cm/cmmi6.pfb><C:/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8
 ><C:/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/MiKTeX/fonts/type1/pu
 blic/amsfonts/cm/cmsy6.pfb><C:/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
 
-Output written on prezentacja.pdf (14 pages, 1132613 bytes).
+Output written on prezentacja.pdf (3 pages, 171495 bytes).
 PDF statistics:
- 422 PDF objects out of 1000 (max. 8388607)
- 49 named destinations out of 1000 (max. 500000)
- 198 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 330 PDF objects out of 1000 (max. 8388607)
+ 21 named destinations out of 1000 (max. 500000)
+ 113 words of extra memory for PDF output out of 10000 (max. 10000000)
 
