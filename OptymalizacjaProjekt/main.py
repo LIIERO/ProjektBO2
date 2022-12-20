@@ -36,6 +36,10 @@ class FarmSimulation:
                  G: dict[str], start_quality: list[int]):
         """Inicjalizacja stałych modelu, mogą być różne dla różnych modeli ale nie zmieniają się w trakcie symulacji
 
+        zmienna Q - macierz jakości gleby w danym roku na danym polu
+
+        zmienna decisionMatrix - macierz zmiennych decyzyjnych
+
         :param N: fieldNumber - Liczba dostępnych pól uprawnych.
         :param Y: yearsNumber - Liczba lat planowania upraw
         :param T: transportCost - Stały koszt dojazdu na kilometr
@@ -61,12 +65,15 @@ class FarmSimulation:
         self.curr_year: int = 0  # Aktualny rok
         self.earnings: float = 0  # Ilość naszych pieniędzy w PLN
 
+        # zmiewnna Q - macierz jakości gleby w danym roku na danym polu
         # Zerowy rząd pełen początkowych jakości, reszta to zera
         self.Q: list[list[Union[int, None]]] = [self.b] + [[None] * N for _ in range(Y - 1)]
+
+        # macierz zmiennych decyzyjnych
         self.decisionMatrix: list[list[str]] = []
 
     def __reset_variables(self) -> None:
-        """Funkcja resetująca model do stanu początkowego
+        """Funkcja resetująca model do stanu początkowego, bez inicjowania nowego obiektu
 
         :arg: None
         :returns: None
@@ -77,7 +84,7 @@ class FarmSimulation:
         self.decisionMatrix = []
 
     def display_solution(self) -> None:
-        """Function to display solution
+        """ Funkcja do wyświetlania rozwiązań
 
         :return: None
         """
@@ -90,58 +97,71 @@ class FarmSimulation:
         print()
 
     def __simulate_year_pass(self, yearly_decision: list[str]) -> None:
-        """ Metoda symulująca
+        """ Metoda symulująca przejście roku na farmie na podstawie decyzji w roku,
 
-        :param yearly_decision:
+        aktualizacja macierzy jakości gleb Q
+
+        aktualizacja
+
+        :param yearly_decision: lista (wiersz) roślin jakie tego roku zasadziliśmy na poszczególnych polach
         :return: None
         """
+
+        # dodatkowy warunek logiczny zapewniający że puste pole nie powtatrza się dwa razy pod rząd
         if len(self.decisionMatrix) > 0:
             for prev, cur in zip(self.decisionMatrix[-1], yearly_decision):
                 if cur != 'EMPTY':
                     if prev == cur:
                         raise ValueError
 
+        # po zapewnieniu zgodności dodajemy nasze rozwiązanie do macierzy decyzyjnej
         self.decisionMatrix.append(yearly_decision)
 
+        # przejście po wszystkich polach w roku
         for i in range(self.fieldNumber):
             plant = self.decisionMatrix[self.curr_year][i]
 
-            # aktualizacja jakości gleby na danym polu po uprawie rośliny
+            # aktualizacja jakości gleby na danym polu po uprawie rośliny (nie zerowy rok)
             if self.curr_year != 0:
+                # odjęcie jakości po uprawie rośliny w tym roku od jakości z poprzedniego roku
                 self.Q[self.curr_year][i] = self.Q[self.curr_year - 1][i] - self.plantInfluenceDict[
                     self.decisionMatrix[self.curr_year - 1][i]]
 
-                # zabezpieczenie przed błednym indeksem
+                # zabezpieczenie przed spadkiem jakości poniżej dolnej granicy (<0)
                 if self.Q[self.curr_year][i] < 0:
                     raise IndexError
 
-                # obliczanie przychodu, jeśli dwa razy nie uprawiamy to zerowy przychud
+                # obliczanie przychodu, jeśli dwa razy nie uprawiamy to zerowy przychód
                 income = 0 if self.decisionMatrix[self.curr_year - 1][i] == plant == 'EMPTY' else (
                         self.fieldsSurfacesList[i] * self.earningsMatrix[plant][math.ceil(self.Q[self.curr_year][i])])
 
             else:
-                # obliczanie przychodu jeśli rok zerowy, nie trzeba sprawdzać poprzedniego
+                # obliczanie przychodu jeśli rok zerowy, nie trzeba sprawdzać poprzedniego roku
                 income = self.fieldsSurfacesList[i] * self.earningsMatrix[plant][math.ceil(self.Q[self.curr_year][i])]
 
-            # obliczanie kosztów uprawy
+            # obliczanie kosztów uprawy w obecnym roku
             expense = 0 if plant == 'EMPTY' else (self.productionCostDict[plant] * self.fieldsSurfacesList[i] +
                                                   self.distanceMatrix[
                                                       i] * self.transportCost)  # Jeśli nic nie siejemy to nie ponosimy kosztów
 
+            # od łącznego przychodu trzeba odjąć wydatki
             self.earnings += income - expense
 
         # następny rok, aktualizacja countera
         self.curr_year += 1
 
     def simulate_farm(self, decision_matrix_X: list[list]):
-        """Funkcja celu
+        """ Funkcja symulująca zyski z hodowli przez kilka lat (z określonej liczby pól), tożsama z funkcją celu w
+        modelu matematycznym
 
         :param decision_matrix_X:
         :return:
         """
         self.__reset_variables()
 
+        # przejście przez wszystkie wiersze (lata)
         for y_dec in decision_matrix_X:
+            #
             self.__simulate_year_pass(y_dec)
 
         return self.earnings  # Ma zwracać rozwiązanie
@@ -189,7 +209,7 @@ class FarmSimulation:
         return self.decisionMatrix
 
     def simulated_annealing(self, s0: list[list], k_max):  # Symulowane wyżarzanie
-        """Nasza implementaacja symulowanego wyżarzania
+        """Nasza implementaacja algorytmu symulowanego wyżarzania
 
         :param s0:
         :param k_max:
