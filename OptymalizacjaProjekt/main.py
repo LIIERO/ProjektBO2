@@ -29,7 +29,7 @@ S - Słownik zamieniający nazwę roślny na przydzielony jej indeks
 
 
 class FarmSimulation:
-    """ Klasa symulująca gospodarstwo
+    """ Klasa symulująca gospodarstwo w problemie
 
     """
     def __init__(self, N: int, Y: int, T: float, P: list[float], D: list[float], C: dict[str], W: dict[str],
