@@ -213,7 +213,7 @@ class FarmSimulation:
 
         :param s0:
         :param k_max:
-        :return: best_s
+        :return: best_s:
         """
         # upewniamy się że zmienne są początkowe
         self.__reset_variables()
@@ -252,7 +252,7 @@ class FarmSimulation:
         """Funkcja wyznaczająca sąsiednie rozwiązanie
 
         :param s_inp:
-        :return:
+        :return: None
         """
         # w sposób pseudo losowy dobieramy rok i pole
         year = random.randrange(self.yearsNumber)
