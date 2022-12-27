@@ -235,18 +235,18 @@ class FarmSimulation:
         return best_s
 
     @staticmethod
-    def __annealing_temp(inp, k_m):
+    def __annealing_temp(inp, k_max):
         """Funkcja obliczająca temperaturę
 
-        :param inp:
-        :param k_m:
-        :return:
+        :param inp: wyrażenie (1 - (k + 1)/k_max)
+        :param k_max: maxymalna liczba iteracji pętli for w głównej metodzie algorytmu SA
+        :return: temperatura
         """
         if inp > 0:
             return inp  # Najprostszy sposób
 
         else:
-            return 1 / k_m
+            return 1 / k_max
 
     def __annealing_neig(self, s_inp):
         """Funkcja wyznaczająca sąsiednie rozwiązanie
@@ -258,7 +258,8 @@ class FarmSimulation:
         year = random.randrange(self.yearsNumber)
         field = random.randrange(self.fieldNumber)
         curr_plant = s_inp[year][field]
-        # losowe przyjęcie rośliny pod warunkiem że jest różna
+
+        # losowe przyjęcie rośliny pod warunkiem że jest różna od obecnej
         rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant])
 
         s_out = deepcopy(s_inp)

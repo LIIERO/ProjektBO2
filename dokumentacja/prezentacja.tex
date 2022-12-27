@@ -13,7 +13,7 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{color}
-
+\usepackage{minted}
 
 \renewcommand\lstlistingname{Quelltext}
 
@@ -49,6 +49,7 @@ W ramach projektu każdy z naszej trójki miał wymysleć pomysł optymalizacji 
 	\item Pomysł Bartka bazował na maxymalizacji jakości komponentów w składanym komputerze przy minimalizacji kosztów
 \end{itemize} 
 
+Wspólną decyzją był pomysł Piotrka optymalizacji gospodarstwa rolnego.
 
 \section{Model matematyczny}
 
@@ -112,16 +113,46 @@ Funkcja celu matematycznie jest zapisana w formie podwójnej sumy,
 
 
 \subsection{symulowane wyżarzanie}
- Nasz problem, na podstawie sugestii pani Profesor postanowiliśmy rozwiązać algorytmem symulowanego wyżarzania (z ang. simulated anealling). Jest to nasz pierwszy pomysł na rozwiązanie problemu.
+Nasz problem, na podstawie sugestii pani Profesor postanowiliśmy rozwiązać algorytmem symulowanego wyżarzania (z ang. simulated anealling). Jest to nasz pierwszy pomysł na rozwiązanie problemu.
+
+\subsubsection{metody algorytmu}
+\begin{itemize}
+	\item \begin{verbatim}
+		simulated_annealing	
+	\end{verbatim}
+	
+	\item \begin{verbatim}
+		__annealing_temp
+	\end{verbatim}
+
+	\item \begin{verbatim}
+		__annealing_neig
+	\end{verbatim}
+
+	\item \begin{verbatim}
+		__annealing_P
+	\end{verbatim}
+
+\end{itemize}
+
+\begin{verbatim}
+	Let s = s0
+	For k = 0 through kmax (exclusive):
+	T ← temperature( 1 - (k+1)/kmax )
+	Pick a random neighbour, snew ← neighbour(s)
+	If P(E(s), E(snew), T) >= random(0, 1): s ← snew
+	Output: the final state s
+\end{verbatim}
+
+
+\subsection{algorytm genetyczny}
 
 
 \subsubsection{wyniki}
 
 
 
-\section{Inna wersja rozwiązania}
 
-W porównaniu z naszym pierwszym rozwiązaniem 
 
 \section{Problemy}
 	
