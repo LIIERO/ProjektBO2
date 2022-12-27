@@ -3,11 +3,10 @@ import random
 import numpy as np
 from copy import deepcopy
 
-import main
-
+import farm_simulation
 
 class Genetic(object):
-    def __init__(self, chromosome, plants, field_number, farm: main.FarmSimulation):
+    def __init__(self, chromosome, plants, field_number, farm: farm_simulation.FarmSimulation):
         self.chromosome = chromosome
         self.farm = farm
         self.plants = plants
@@ -218,7 +217,7 @@ class Genetic(object):
         return earnings
 
 
-def genetic_algorithm(farm: main.FarmSimulation, plants, number_chromosome, selection_type="roulette"):
+def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chromosome, selection_type="roulette"):
     greedy_result = farm.solve_greedy() #rozwiązanie konstrukcyjne
     j = 0
     farm.earnings = 0
