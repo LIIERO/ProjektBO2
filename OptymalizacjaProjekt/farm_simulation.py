@@ -190,8 +190,7 @@ class FarmSimulation:
 
                         elif y_dec == 0 or (y_dec > 0 and plant != self.decisionMatrix[y_dec - 1][no_field]):
                             plant_inc = (self.fieldsSurfacesList[no_field] * self.earningsMatrix[plant][
-                                math.ceil(pred_qual)]) - (
-                                                self.productionCostDict[plant] * self.fieldsSurfacesList[no_field] +
+                                math.ceil(pred_qual)]) - (self.productionCostDict[plant] * self.fieldsSurfacesList[no_field] +
                                                 self.distanceMatrix[no_field] * self.transportCost)
 
                         else:
@@ -207,8 +206,15 @@ class FarmSimulation:
         return self.decisionMatrix
 
     def simulated_annealing(self, s0: list[list], k_max, stages): # Symulowane wyżarzanie
+        """Nasza implementaacja algorytmu symulowanego wyżarzania
+
+                :param s0:
+                :param k_max:
+                :param stages:
+                :return: best_s:
+                """
         self.__reset_variables()
-        beast_s = deepcopy(s0) # Rozwiązanie najlepsze (rozwiązanie bestialskie)
+        best_s = deepcopy(s0) # Rozwiązanie najlepsze (rozwiązanie bestialskie)
         s = deepcopy(s0) # Rozwiązanie początkowe
 
         for k in range(k_max):
@@ -220,8 +226,8 @@ class FarmSimulation:
                 for _ in range(stages):
                     s_new = self.__annealing_neig(s, k_max, T, year, field)
 
-                    if self.simulate_farm(s_new[0]) > self.simulate_farm(beast_s):
-                        beast_s = s_new[0]
+                    if self.simulate_farm(s_new[0]) > self.simulate_farm(best_s):
+                        best_s = s_new[0]
 
                     if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new[0]), T) >= random.uniform(0, 1):
                         s = deepcopy(s_new[0])
@@ -231,7 +237,7 @@ class FarmSimulation:
             else:
                 break
 
-        return beast_s
+        return best_s
 
     @staticmethod
     def __annealing_temp(inp, k_m): # Funkcja obliczająca temperaturę
@@ -239,10 +245,10 @@ class FarmSimulation:
 
     def __annealing_neig(self, s_inp, k_m, T, last_year, last_field): # Funkcja wyznaczająca sąsiednie rozwiązanie
 
-        range_year = self.__range_builder(last_year-T*self.yearsNumber/(2*k_m), last_year+T*self.yearsNumber/(2*k_m),
+        range_year = self.__range_builder(last_year - T * self.yearsNumber/(2*k_m), last_year+T * self.yearsNumber/(2*k_m),
                                           self.yearsNumber)
 
-        range_field = self.__range_builder(last_field-T*self.fieldNumber/(2*k_m), last_field+T*self.fieldNumber/(2*k_m),
+        range_field = self.__range_builder(last_field - T * self.fieldNumber/(2*k_m), last_field+T*self.fieldNumber/(2*k_m),
                                            self.fieldNumber)
 
         year = random.randrange(range_year[0], range_year[1])
