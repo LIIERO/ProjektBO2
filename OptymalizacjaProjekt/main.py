@@ -222,7 +222,7 @@ class FarmSimulation:
         s = deepcopy(s0)  # Rozwiązanie początkowe
 
         for k in range(k_max):
-            # praypisywanie nowej temperatury co iteracje
+            # przypisywanie nowej temperatury co iteracje
             T = self.__annealing_temp(1 - ((k + 1) / k_max), k_max)
             s_new = self.__annealing_neig(s)
 
@@ -236,7 +236,7 @@ class FarmSimulation:
 
     @staticmethod
     def __annealing_temp(inp, k_max):
-        """Funkcja obliczająca temperaturę
+        """Funkcja obliczająca temperaturę w algorytmie symulowanego wyżarzania
 
         :param inp: wyrażenie (1 - (k + 1)/k_max)
         :param k_max: maxymalna liczba iteracji pętli for w głównej metodzie algorytmu SA
@@ -249,10 +249,10 @@ class FarmSimulation:
             return 1 / k_max
 
     def __annealing_neig(self, s_inp):
-        """Funkcja wyznaczająca sąsiednie rozwiązanie
+        """Funkcja wyznaczająca sąsiednie/nowe rozwiązanie
 
-        :param s_inp:
-        :return: None
+        :param s_inp: macierz decyzji/obecne rozwiązanie
+        :return s_out: Kandydat na nowe rozwiązanie
         """
         # w sposób pseudo losowy dobieramy rok i pole
         year = random.randrange(self.yearsNumber)
@@ -260,16 +260,13 @@ class FarmSimulation:
         curr_plant = s_inp[year][field]
 
         # losowe przyjęcie rośliny pod warunkiem że jest różna od obecnej
+        # z listy stworzonej przez list compehension pod warunkiem ze różni się
         rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant])
 
         s_out = deepcopy(s_inp)
         s_out[year][field] = rand_plant
-        
-        # Zabezpieczenie przed wybraniem niedozwolonego rozwiązania
-        # if rand_plant != 'EMPTY':
-        # if (year > 0 and s_inp[year - 1][field] == rand_plant) or (year < self.yearsNumber-1 and s_inp[year + 1][field] == rand_plant):
 
-        # try
+        # próbujemy symulacji, jeżeli wyrzuci błąd rekurencyjnie próbujemy ponowie
         try:
             self.simulate_farm(s_out)
 
@@ -284,18 +281,18 @@ class FarmSimulation:
         return s_out
 
     @staticmethod
-    def __annealing_P(e, e_dash, temp):
+    def __annealing_P(e, e_new, temp):
         """ Funkcja akceptująca rozwiązanie, zmodyfikowana bo maksymalizujemy
 
-        :param e:
-        :param e_dash:
-        :param temp:
-        :return:
+        :param e: wartość funkcji celu dla obecnego rozwiązania
+        :param e_new: wartość funkcji celu dla nowego rozwiązania
+        :param temp: obecna temperatura
+        :return: prawdopodobieństwo wyboru nowego rozwiązania
         """
-        if e_dash > e:
+        if e_new > e:
             return 1
         else:
-            return np.exp(((-1) * (e - e_dash)) / temp)
+            return np.exp(((-1) * (e - e_new)) / temp)
 
 
 def main():
