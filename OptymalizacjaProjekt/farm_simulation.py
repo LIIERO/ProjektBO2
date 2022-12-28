@@ -158,7 +158,7 @@ class FarmSimulation:
 
         # przejście przez wszystkie wiersze (lata)
         for y_dec in decision_matrix_X:
-            #
+            # wywołanie funkcji pomocniczej, odpowiedzialnej za symulacje jednego roku
             self.__simulate_year_pass(y_dec)
 
         return self.earnings  # Ma zwracać rozwiązanie
