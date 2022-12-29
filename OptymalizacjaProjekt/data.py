@@ -31,5 +31,7 @@ default_P = [1.05, 4.14, 1.69, 1.81, 3.66] # Powierzchnie pól
 default_D = [2.08, 7.07, 8.42, 1.37, 6.60] # Odległości od pól
 default_b = [90, 34, 54, 5, 16]  # Początkowe jakości gleb na każdym polu
 
-MAXN = 6 # Maksymalna dopuszczalna liczba pól (uwaga ze zmianą tej wartości)
-MAXY = 6 # Maksymalna dopuszczalna liczba lat (można zmieniać)
+MAXN = 10 # Maksymalna dopuszczalna liczba pól (uwaga ze zmianą tej wartości)
+MAXY = 10 # Maksymalna dopuszczalna liczba lat (można zmieniać)
+
+MAX_AN_ITER = 10000 # Maksymalna liczba iteracji w symulowanym wyżarzaniu

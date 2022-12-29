@@ -1,6 +1,7 @@
 
 import sys
 # from PyQt5.QtWidgets import QApplication, QStackedWidget
+from PyQt5.QtGui import QIcon
 from GUI import app, widget, okno_init, okno_init2, okno
 
 def main():
@@ -10,9 +11,9 @@ def main():
     widget.addWidget(okno)
 
     widget.setCurrentWidget(okno_init)
-
-    # if okno_init.set_default: N, Y = default_N, default_Y
-    # else: N, Y = okno_init.N, okno_init.Y
+    widget.setWindowIcon(QIcon('field.jpg'))
+    widget.setWindowTitle("Symulator gospodarstwa")
+    widget.setGeometry(50, 50, 300, 100)
 
     widget.show()
     sys.exit(app.exec_())

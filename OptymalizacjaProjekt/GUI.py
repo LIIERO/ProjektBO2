@@ -1,7 +1,9 @@
 from data import *
 import sys
+import random
+import matplotlib.pyplot as plt
+import numpy as np
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QApplication, QStackedWidget
 
 import genetic_algorithm
@@ -55,7 +57,7 @@ class InitWindow(Window): # Nie dokończone
         LayoutT.addWidget(self.yearEdt, 1, 1)
 
         continueBtn = QPushButton("&Kontynuuj", self)
-        skipBtn = QPushButton("&Ustaw domyślne parametry", self)
+        skipBtn = QPushButton("&Użyj parametrów domyślnych (N = 5, Y = 5)", self)
         LayoutT.addWidget(continueBtn, 2, 0, 1, 3)
         LayoutT.addWidget(skipBtn, 3, 0, 1, 3)
 
@@ -64,15 +66,13 @@ class InitWindow(Window): # Nie dokończone
         continueBtn.clicked.connect(self.cont)
         skipBtn.clicked.connect(self.skip)
 
-        self.setGeometry(50, 50, 300, 100)
-        self.setWindowIcon(QIcon('field.jpg'))
-        self.setWindowTitle("Symulator gospodarstwa")
-        # self.show()
+        # self.setGeometry(50, 50, 300, 100)
 
     @staticmethod
     def skip():
-        global N, Y
-        N, Y = default_N, default_Y
+        global N, Y, P, D, b
+        N, Y, P, D, b = default_N, default_Y, default_P, default_D, default_b
+        okno.interface()
         widget.setCurrentWidget(okno)
 
     def cont(self):
@@ -115,38 +115,58 @@ class Init2Window(Window):
         for n, _ in enumerate(self.qualityEdt): LayoutT.addWidget(self.qualityEdt[n], 2, n+1)
 
         continueBtn = QPushButton("&Kontynuuj", self)
+        randBtn = QPushButton("&Losuj dane", self)
         LayoutT.addWidget(continueBtn, 3, 0)
+        LayoutT.addWidget(randBtn, 3, 1, 1, 3)
 
         self.setLayout(LayoutT)
 
         continueBtn.clicked.connect(self.cont)
+        randBtn.clicked.connect(self.random_data)
+        # self.setGeometry(50, 50, 300, 100)
 
-        # continueBtn.clicked.connect(self.cont)
-
-        self.setGeometry(50, 50, 300, 100)
-        self.setWindowIcon(QIcon('field.jpg'))
-        self.setWindowTitle("Symulator gospodarstwa")
-        # self.show()
+    def random_data(self):
+        Pr = [round(random.uniform(1, 6), 3) for _ in range(N)]
+        Dr = [round(random.uniform(0.1, 10), 3) for _ in range(N)]
+        br = random.sample(range(1, MQ-1), N)
+        for n in range(N):
+            self.surfaceEdt[n].setText(str(Pr[n]))
+            self.distanceEdt[n].setText(str(Dr[n]))
+            self.qualityEdt[n].setText(str(br[n]))
 
     def cont(self):
-        widget.setCurrentWidget(okno)
+        global P, D, b
+        try:
+            P = [float(f.text()) for f in self.surfaceEdt]
+            D = [float(f.text()) for f in self.distanceEdt]
+            b = [int(f.text()) for f in self.qualityEdt]
+            if min(P) <= 0 or min(D) <= 0 or min(b) <= 0 or max(b) >= 100:
+                raise ValueError
+
+            okno.interface()
+            widget.setCurrentWidget(okno)
+        except ValueError:
+            QMessageBox.warning(self, "Błąd", "Błędne dane", QMessageBox.Ok)
+
 
 
 class FarmGUI(Window):
-    def __init__(self, def_N, def_Y, def_P, def_D, def_b, parent=None):
-        self.N, self.Y, self.P, self.D, self.b = def_N, def_Y, def_P, def_D, def_b
+    def __init__(self, parent=None):
+        # self.N, self.Y, self.P, self.D, self.b = def_N, def_Y, def_P, def_D, def_b
 
         self.resultEdt = QLineEdit()
-        self.sim = FarmSimulation(self.N, self.Y, T, self.P, self.D, C, W, G, self.b)
+        self.anIterEdt = QLineEdit()
+        self.sim = None
 
         super().__init__(parent)
-        self.interface()
+        # self.interface()
 
     def interface(self):
+        self.sim = FarmSimulation(N, Y, T, P, D, C, W, G, b)
 
         # etykiety
-        label1 = QLabel("Liczba pól:", self)
-        label2 = QLabel("Liczba symulowanych lat:", self)
+        label1 = QLabel(f"Liczba pól = {N}", self)
+        label2 = QLabel(f"Liczba lat = {Y}", self)
         label3 = QLabel("Zysk:", self)
 
         # przypisanie widgetów do układu tabelarycznego
@@ -155,23 +175,22 @@ class FarmGUI(Window):
         LayoutT.addWidget(label2, 0, 1)
         LayoutT.addWidget(label3, 0, 2)
 
-        # 1-liniowe pola edycyjne
-        fieldEdt = QLineEdit()
-        yearEdt = QLineEdit()
-
         self.resultEdt.readonly = True
         self.resultEdt.setToolTip('Wpisz wszystkie parametry i wybierz interesujący algorytm...')
         self.resultEdt.resize(self.resultEdt.sizeHint())
 
-        LayoutT.addWidget(fieldEdt, 1, 0)
-        LayoutT.addWidget(yearEdt, 1, 1)
+        rozwinitBtn = QPushButton("&rozw. początkowe", self)
+        rozwbestBtn = QPushButton("&rozw. najlepsze", self)
+
+        LayoutT.addWidget(rozwinitBtn, 1, 0)
+        LayoutT.addWidget(rozwbestBtn, 1, 1)
         LayoutT.addWidget(self.resultEdt, 1, 2)
 
         # przyciski
         greedyBtn = QPushButton("&greedy", self)
         annealingBtn = QPushButton("&annealing", self)
-        genetic_rouleBtn = QPushButton("&genetic_roule", self)
-        genetic_rankBtn = QPushButton("&genetic_rank", self)
+        genetic_rouleBtn = QPushButton("&genetic roule", self)
+        genetic_rankBtn = QPushButton("&genetic rank", self)
         endBtn = QPushButton("&end", self)
         endBtn.resize(endBtn.sizeHint())
 
@@ -182,10 +201,18 @@ class FarmGUI(Window):
         LayoutH.addWidget(genetic_rankBtn)
 
         LayoutT.addLayout(LayoutH, 2, 0, 1, 3)
-        LayoutT.addWidget(endBtn, 3, 0, 1, 3)
+
+        LayoutT.addWidget(QLabel("Iteracje wyżarzania: ", self), 3, 0)
+        LayoutT.addWidget(self.anIterEdt, 3, 1)
+        self.anIterEdt.setText(str(1000))
+
+        LayoutT.addWidget(endBtn, 4, 0, 1, 3)
 
         # przypisanie utworzonego układu do okna
         self.setLayout(LayoutT)
+
+        rozwinitBtn.clicked.connect(self.show_begin_solution)
+        rozwbestBtn.clicked.connect(self.show_best_solution)
 
         endBtn.clicked.connect(self.end)
         greedyBtn.clicked.connect(self.greedy)
@@ -193,18 +220,29 @@ class FarmGUI(Window):
         genetic_rouleBtn.clicked.connect(self.genetic)
         genetic_rankBtn.clicked.connect(self.genetic)
 
-        self.setGeometry(50, 50, 300, 100)
-        self.setWindowIcon(QIcon('field.jpg'))
-        self.setWindowTitle("Symulator gospodarstwa")
-        # self.show()
+        # self.setGeometry(50, 50, 300, 100)
+
+    def show_begin_solution(self): # Nie zaimplementowane
+        pass
+        # for row in self.sim.decisionMatrix:
+        #     print(row)
+
+    def show_best_solution(self): # Nie zaimplementowane
+        pass
 
     def annealing(self):
-        greedy_s = self.sim.solve_greedy()
-        iterations = 1000 #zmiennić żeby dało się ustawić
-        sol = self.sim.simulated_annealing(greedy_s, iterations, 3)
-        self.sim.simulate_farm(sol)
+        try:
+            it = int(self.anIterEdt.text())
+            if it < 1 or it > MAX_AN_ITER: raise ValueError
 
-        self.resultEdt.setText(str(round(self.sim.earnings, 3)))
+            greedy_s = self.sim.solve_greedy()
+            sol = self.sim.simulated_annealing(greedy_s, it)
+            self.sim.simulate_farm(sol)
+
+            self.resultEdt.setText(str(round(self.sim.earnings, 3)))
+
+        except ValueError:
+            QMessageBox.warning(self, "Błąd", "Błędne dane", QMessageBox.Ok)
 
     def genetic(self):
 
@@ -212,9 +250,9 @@ class FarmGUI(Window):
         wynik = ""
 
         try:
-            if sender.text() == "&genetic_roule":
+            if sender.text() == "&genetic roule":
                 wynik = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, 11, "roulette")
-            elif sender.text() == "&genetic_rank":
+            elif sender.text() == "&genetic rank":
                 wynik = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, 11, "rank")
             self.resultEdt.setText(str(round(wynik, 3)))
         except ValueError:
@@ -224,11 +262,12 @@ class FarmGUI(Window):
         self.sim.solve_greedy()
         self.resultEdt.setText(str(round(self.sim.earnings, 3)))
 
-N, Y = None, None
+N, Y = 0, 0
+P, D, b = [], [], []
 
 app = QApplication(sys.argv)
 widget = QStackedWidget()
 
 okno_init = InitWindow()
 okno_init2 = Init2Window()
-okno = FarmGUI(default_N, default_Y, default_P, default_D, default_b)
+okno = FarmGUI()
