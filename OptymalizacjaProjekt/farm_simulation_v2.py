@@ -1,57 +1,50 @@
 import numpy as np
 import math
 import random
-from typing import NewType, Union
+from typing import Union
 from copy import deepcopy
-
-"""Plant = NewType('Plant', str)
-Earnings = NewType('Earnings', dict)
-Degradation = NewType('Degradation', dict)"""
 
 PLANTS = ['potato', 'wheat', 'rye', 'triticale', 'EMPTY']
 MQ = 100  # Maksymalna jakość gleby
 
-"""
-fieldNumber, N - Liczba dostępnych pól uprawnych.
-yearsNumber, Y - Liczba lat planowania upraw.
-transportCost, T - Stały koszt dojazdu na kilometr
-fieldsSurfacesList, P - Lista powierzchnii poszczególnych pól uprawnych w hektarach
-distanceMatrix, D - Lista odległości poszczególnych pól od gospodarstwa
-productionCostDict - Słownik kosztów produkcji danej rosliny na jeden hektar (koszt materiału siewnego,
-    koszt pracy ludzkiej, itp.)
-plantInfluenceDict, W - Słownik wpływów poszczególnych upraw na glebe
-earningsMatrix, G - Macierz zysków z danej uprawy.
-Q - Macierz jakości gleby na danym polu w danym roku
-decisionMatrix, X - Macierz decyzyjna zawieracjąca informacje o wybranych roślinach do uprawy na dany polu w danym
-    roku
-S - Słownik zamieniający nazwę roślny na przydzielony jej indeks
-"""
-
 
 class FarmSimulation:
-    """ Klasa symulująca gospodarstwo w problemie
-
     """
+    fieldNumber, N - Liczba dostępnych pól uprawnych.
+    yearsNumber, Y - Liczba lat planowania upraw.
+    transportCost, T - Stały koszt dojazdu na kilometr
+    fieldsSurfacesList, P - Lista powierzchnii poszczególnych pól uprawnych w hektarach
+    distanceMatrix, D - Lista odległości poszczególnych pól od gospodarstwa
+    productionCostDict - Słownik kosztów produkcji danej rosliny na jeden hektar (koszt materiału siewnego,
+        koszt pracy ludzkiej, itp.)
+    plantInfluenceDict, W - Słownik wpływów poszczególnych upraw na glebe
+    earningsMatrix, G - Macierz zysków z danej uprawy.
+    Q - Macierz jakości gleby na danym polu w danym roku
+    decisionMatrix, X - Macierz decyzyjna zawieracjąca informacje o wybranych roślinach do uprawy na dany polu w danym
+        roku
+    S - Słownik zamieniający nazwę roślny na przydzielony jej indeks
+    """
+
     def __init__(self, N: int, Y: int, T: float, P: list[float], D: list[float], C: dict[str], W: dict[str],
                  G: dict[str], start_quality: list[int]):
         """Inicjalizacja stałych modelu, mogą być różne dla różnych modeli ale nie zmieniają się w trakcie symulacji
 
-        zmienna Q - macierz jakości gleby w danym roku na danym polu
+                zmienna Q - macierz jakości gleby w danym roku na danym polu
 
-        zmienna decisionMatrix - macierz zmiennych decyzyjnych
+                zmienna decisionMatrix - macierz zmiennych decyzyjnych
 
-        :param N: fieldNumber - Liczba dostępnych pól uprawnych.
-        :param Y: yearsNumber - Liczba lat planowania upraw
-        :param T: transportCost - Stały koszt dojazdu na kilometr
-        :param P: fieldsSurfacesList - Lista powierzchnii poszczególnych pól uprawnych w hektarach
-        :param D: distanceMatrix - Lista odległości poszczególnych pól od gospodarstwa
-        :param C: productionCostDict - Słownik kosztów produkcji danej rosliny na jeden hektar (koszt materiału
-            siewnego, koszt pracy ludzkiej, itp.)
-        :param W: plantInfluenceDict - Słownik wpływów poszczególnych upraw na glebe
-        :param G: earningsMatrix - Macierz zysków z danej uprawy.
-        :param start_quality: b - macierz początkowych jakości gleb
-        :returns: None
-        """
+                :param N: fieldNumber - Liczba dostępnych pól uprawnych.
+                :param Y: yearsNumber - Liczba lat planowania upraw
+                :param T: transportCost - Stały koszt dojazdu na kilometr
+                :param P: fieldsSurfacesList - Lista powierzchnii poszczególnych pól uprawnych w hektarach
+                :param D: distanceMatrix - Lista odległości poszczególnych pól od gospodarstwa
+                :param C: productionCostDict - Słownik kosztów produkcji danej rosliny na jeden hektar (koszt materiału
+                    siewnego, koszt pracy ludzkiej, itp.)
+                :param W: plantInfluenceDict - Słownik wpływów poszczególnych upraw na glebe
+                :param G: earningsMatrix - Macierz zysków z danej uprawy.
+                :param start_quality: b - macierz początkowych jakości gleb
+                :returns: None
+                """
         self.fieldNumber = N
         self.yearsNumber = Y
         self.transportCost = T
@@ -89,11 +82,15 @@ class FarmSimulation:
         :return: None
         """
         print('\nRozwiązanie dające dochód {:.2f} zł'.format(self.earnings))
+
         for row in self.decisionMatrix:
             print(row)
+
         print('\nMacierz jakości gleb pól na przestrzeni lat')
+
         for row in self.Q:
             print(row)
+
         print()
 
     def __simulate_year_pass(self, yearly_decision: list[str]) -> None:
@@ -161,7 +158,7 @@ class FarmSimulation:
 
         # przejście przez wszystkie wiersze (lata)
         for y_dec in decision_matrix_X:
-            #
+            # wywołanie funkcji pomocniczej, odpowiedzialnej za symulacje jednego roku
             self.__simulate_year_pass(y_dec)
 
         return self.earnings  # Ma zwracać rozwiązanie
@@ -193,8 +190,7 @@ class FarmSimulation:
 
                         elif y_dec == 0 or (y_dec > 0 and plant != self.decisionMatrix[y_dec - 1][no_field]):
                             plant_inc = (self.fieldsSurfacesList[no_field] * self.earningsMatrix[plant][
-                                math.ceil(pred_qual)]) - (
-                                                self.productionCostDict[plant] * self.fieldsSurfacesList[no_field] +
+                                math.ceil(pred_qual)]) - (self.productionCostDict[plant] * self.fieldsSurfacesList[no_field] +
                                                 self.distanceMatrix[no_field] * self.transportCost)
 
                         else:
@@ -206,79 +202,106 @@ class FarmSimulation:
                 dec.append(best_plant)
 
             self.__simulate_year_pass(dec)
+
         return self.decisionMatrix
 
-    def simulated_annealing(self, s0: list[list], k_max):  # Symulowane wyżarzanie
+    def simulated_annealing(self, s0: list[list], k_max, stages): # Symulowane wyżarzanie
         """Nasza implementaacja algorytmu symulowanego wyżarzania
 
-        :param s0:
-        :param k_max:
-        :return: best_s:
-        """
-        # upewniamy się że zmienne są początkowe
+                :param s0:
+                :param k_max:
+                :param stages:
+                :return: best_s:
+                """
         self.__reset_variables()
-
-        best_s = deepcopy(s0)  # Rozwiązanie najlepsze
-        s = deepcopy(s0)  # Rozwiązanie początkowe
+        best_s = deepcopy(s0) # Rozwiązanie najlepsze (rozwiązanie bestialskie)
+        s = deepcopy(s0) # Rozwiązanie początkowe
 
         for k in range(k_max):
-            # przypisywanie nowej temperatury co iteracje
-            T = self.__annealing_temp(1 - ((k + 1) / k_max), k_max)
-            s_new = self.__annealing_neig(s)
+            if k_max >= 0.99**k:
+                year = random.randrange(self.yearsNumber)
+                field = random.randrange(self.fieldNumber)
+                T = self.__annealing_temp(k, k_max)
 
-            if self.simulate_farm(s_new) > self.simulate_farm(best_s):
-                best_s = s_new
+                # kilka podejść na temperaturę ( epokę )
+                for _ in range(stages):
+                    s_new = self.__annealing_neig(s, k_max, T, year, field)
 
-            if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
-                s = deepcopy(s_new)
+                    if self.simulate_farm(s_new[0]) > self.simulate_farm(best_s):
+                        best_s = s_new[0]
+
+                    if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new[0]), T) >= random.uniform(0, 1):
+                        s = deepcopy(s_new[0])
+                        year = s_new[1]
+                        field = s_new[2]
+
+            else:
+                break
 
         return best_s
 
     @staticmethod
-    def __annealing_temp(inp, k_max):
-        """Funkcja obliczająca temperaturę w algorytmie symulowanego wyżarzania
+    def __annealing_temp(inp, k_m): # Funkcja obliczająca temperaturę
+        return k_m * 0.99**inp # Najprostszy sposób
 
-        :param inp: wyrażenie (1 - (k + 1)/k_max)
-        :param k_max: maxymalna liczba iteracji pętli for w głównej metodzie algorytmu SA
-        :return: temperatura
-        """
-        if inp > 0:
-            return inp  # Najprostszy sposób
+    def __annealing_neig(self, s_inp, k_m, T, last_year, last_field): # Funkcja wyznaczająca sąsiednie rozwiązanie
+        """  """
 
-        else:
-            return 1 / k_max
+        # jeśli to nie jest pierwsze podejście to losujemy z mniejszego zakresu
+        # większ losowość przy wyższej temperaturze
+        range_year = self.__range_builder(last_year - T * self.yearsNumber/(2*k_m), last_year+T * self.yearsNumber/(2*k_m),
+                                          self.yearsNumber)
 
-    def __annealing_neig(self, s_inp):
-        """Funkcja wyznaczająca sąsiednie/nowe rozwiązanie
+        range_field = self.__range_builder(last_field - T * self.fieldNumber/(2*k_m), last_field+T*self.fieldNumber/(2*k_m),
+                                           self.fieldNumber)
 
-        :param s_inp: macierz decyzji/obecne rozwiązanie
-        :return s_out: Kandydat na nowe rozwiązanie
-        """
-        # w sposób pseudo losowy dobieramy rok i pole
-        year = random.randrange(self.yearsNumber)
-        field = random.randrange(self.fieldNumber)
+        year = random.randrange(range_year[0], range_year[1])
+
+        field = random.randrange(range_field[0], range_field[1])
+
         curr_plant = s_inp[year][field]
 
-        # losowe przyjęcie rośliny pod warunkiem że jest różna od obecnej
-        # z listy stworzonej przez list compehension pod warunkiem ze różni się
-        rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant])
+        self.simulate_farm(s_inp)
+
+        rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant or plant == "EMPTY"])
+
+        if year > 0:
+            while (self.Q[year - 1][field] - self.plantInfluenceDict[rand_plant]) < 0:
+                rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant or plant == "EMPTY"])
 
         s_out = deepcopy(s_inp)
         s_out[year][field] = rand_plant
 
-        # próbujemy symulacji, jeżeli wyrzuci błąd rekurencyjnie próbujemy ponowie
         try:
             self.simulate_farm(s_out)
 
         except IndexError:
             # print('Nie spełnia ograniczenia jakości')
-            return self.__annealing_neig(s_inp)  # Ponowna próba
+            return self.__annealing_neig(s_inp, k_m, T, last_year, last_field) # Ponowna próba
 
         except ValueError:
             # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
-            return self.__annealing_neig(s_inp)  # Ponowna próba
+            return self.__annealing_neig(s_inp, k_m, T, last_year, last_field) # Ponowna próba
 
-        return s_out
+        return s_out, year, field
+
+    @staticmethod
+    def __range_builder(lower, higher, max_number):
+        """  """
+        lower = int(lower)
+        higher = int(higher)
+
+        if lower == higher:
+            lower -= 1
+            higher += 1
+
+        if lower < 0:
+            lower = 0
+
+        if higher > max_number:
+            higher = max_number
+
+        return [lower, higher]
 
     @staticmethod
     def __annealing_P(e, e_new, temp):
@@ -294,71 +317,3 @@ class FarmSimulation:
         else:
             return np.exp(((-1) * (e - e_new)) / temp)
 
-
-def main():
-    # Dane pozyskane z internetu:
-    T = 6 / 15 * 8 * 2 * 7.546  # spalanie na godzine/predkośc*ile razy trzeba pojechać * 2 * cena paliwa
-
-    Cwheat = (87.43 + 19.76) * 2.5 + (87.43 + 27.56) * 2 + (87.43 + 18.80) * 2 + (
-            87.43 + 31.9) * 2.5 + 850 * 1.22 + 366 * 1.22 + 540 + 1458 + 1699 + 148 + 34
-    Crye = (87.43 + 19.76) * 2 + (87.43 + 27.56) * 1.5 + (87.43 + 18.80) * 2 + (87.43 + 31.9) * 2.5 + 3000
-    Cpotato = 2 * ((87.43 + 19.76) * 2.5 + (87.43 + 27.56) * 2 + (87.43 + 18.80) * 2 + (
-            87.43 + 31.9) * 2.5) + 17519.3412754
-    Ctriticale = (87.43 + 19.76) * 2.5 + (87.43 + 27.56) * 2 + (87.43 + 18.80) * 2 + (87.43 + 31.9) * 2.5 + 3573
-    C = {'potato': Cpotato, 'wheat': Cwheat, 'rye': Crye, 'triticale': Ctriticale, 'EMPTY': 0}
-
-    W = {'potato': 5, 'wheat': 8, 'rye': 3, 'triticale': 5, 'EMPTY': -5}
-
-    G = {'potato': [], 'wheat': [], 'rye': [], 'triticale': [], 'EMPTY': []}
-
-    for i in range(MQ):
-        G['potato'].append(0 if i < 12 else (math.e ** ((i - 12) / 10) / 6002.91 * 17 + 24) * 710 + 558 + 1761.46)
-        G['wheat'].append(0 if i < 35 else (math.e ** ((i - 35) / 10) / 601.845 * 10 + 3.9) * 1490 + 558)
-        G['rye'].append((math.e ** (i / 10) / 19930.4 * 6 + 3) * 1150 + 558)
-        G['triticale'].append(0 if i < 17 else (math.e ** ((i - 17) / 10) / 3640.95 * 9 + 3) * 1339 + 558)
-        G['EMPTY'].append(40)
-
-    # Dane dowolne:
-    N = 5
-    Y = 5
-
-    P = [1.05, 4.14, 1.69, 1.81, 3.66]
-    # P = [random.uniform(1, 6) for _ in range(N)]
-    D = [2.08, 7.07, 8.42, 1.37, 6.60]
-    # D = [random.uniform(0.1, 10) for _ in range(N)]
-    b = [90, 34, 54, 5, 16]  # Początkowe jakości gleb na każdym polu
-    # b = random.sample(range(0, MQ), N)
-
-    # Symulacja
-    f_sim = FarmSimulation(N, Y, T, P, D, C, W, G, b)
-
-    # X = [['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
-    #      ['rye', 'rye', 'rye', 'rye', 'rye'],
-    #      ['wheat', 'wheat', 'wheat', 'wheat', 'wheat'],
-    #      ['rye', 'rye', 'rye', 'rye', 'rye'],
-    #      ['wheat', 'wheat', 'wheat', 'wheat', 'wheat']]
-    # print('Przykład')
-    # f_sim.simulate_farm(X)  # Przykład dla samej pszenicy
-    # f_sim.display_solution()
-
-    # Algorytm zachłanny
-    print('Rozwiązanie algorytmu zachłannego')
-    greedy_s = f_sim.solve_greedy()
-    f_sim.display_solution()
-
-    # Wyżarzanie
-    iterations = 1000  # Maksymalna liczba iteracji
-
-    print('Wyżarzanie dla rozwiązania począkowego zachłannego')
-    sol = f_sim.simulated_annealing(greedy_s, iterations)
-    f_sim.simulate_farm(sol)
-    f_sim.display_solution()
-
-    # print('Wyżarzanie dla rozwiązania począkowego przykładowego')
-    # sol = f_sim.simulated_annealing(X, iterations)
-    # f_sim.simulate_farm(sol)
-    # f_sim.display_solution()
-
-
-if __name__ == '__main__':
-    main()

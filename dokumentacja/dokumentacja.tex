@@ -45,7 +45,7 @@ W ramach projektu każdy z naszej trójki miał wymysleć pomysł optymalizacji 
 \begin{itemize}
 	\item Pomysł Dawida zakładał optymalizacje wydatków związanych z zakupem opału w sezonie grzewczym
 	\item Pomysł Piotrka opierał się na optymalizacji zysków z hodowli roślinnej w średnim gospodarstwie rolnym.
-	\item Pomysł Bartka bazował na maxymalizacji jakości komponentów w składanym komputerze przy minimalizacji kosztów
+	\item Pomysł Bartka bazował na maksymalizacji jakości komponentów w składanym komputerze przy minimalizacji kosztów
 \end{itemize} 
 
 Wspólną decyzją był pomysł Piotrka optymalizacji gospodarstwa rolnego.
@@ -151,8 +151,15 @@ Jako że maksymalizujemy to funkcja zwraca 1 jeżeli nowe rozwiązanie ma wyższ
 Funkcja pomocnicza wybierająca kandydata na nowe rozwiązanie. Kandydat jest macierzą (\hyperref[postac_rozw]{wyjaśnienie tutaj}) w której zmieniono w randomowy sposób jedną roślinę (randomowo dobieramy rok i pole, czyli pozycję w macierzy). Roślina na jaką zamieniamy to pole w macierzy wybieramy randomowo z listy roślin z wykluczeniem poprzedniej na tej pozycji.
 Funkcja wykorzystuje model brute-force do sprawdzenia czy nowe rozwiązanie nadaje się do symulacji, tzn. czy nie wyskoczy żaden błąd przy próbie odpalenia simulate farm, zaś jeżeli wyskoczy rekurencyjne powtórzenie funkcji. 
 
-	\paragraph{simulated annealing}
+\paragraph{simulated annealing}
 Główna funkcja zaimplementowanego algorytmu na podstawie pseudo-kodu:
+
+
+\paragraph{wersja druga}
+Drugie podejście charakteryzowało się innym podejściem do zmian temperatury
+inne podejście do epoki (iteracji po jednej temperaturze), może mieć kilka prób dla jednej epoki,
+zmiana podejścia do sąsiedztwa w kontekście jednej epoki
+
 
 \begin{figure}[H]
 	\centering
@@ -164,6 +171,16 @@ Główna funkcja zaimplementowanego algorytmu na podstawie pseudo-kodu:
 
 Algorytm działa $ k_{max} $ razy w pętli for, 
 w pierwszym kroku każdej iteracji jest przypisywana nowa temperatura zwracana z funkcji annealling temp
+
+
+\paragraph{wersja druga}
+Drugie podejście charakteryzowało się innym podejściem do zmian temperatury
+
+inne podejście do epoki (iteracji po jednej temperaturze), może mieć kilka prób dla jednej epoki,
+
+zmiana podejścia do sąsiedztwa w kontekście jednej epoki
+
+głowne zalorzenie to zmniejszanie zakresu wyboru/uzaleznienie losowosci od temp
 
 
 \subsection{algorytm genetyczny}
