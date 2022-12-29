@@ -318,17 +318,19 @@ def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chrom
     genetic_result = [i[:-1] for i in genetic_result]
     genetic_result = zip(*genetic_result[::])
     genetic_result = list(genetic_result)
-    print(f"Wynik z algorytmu genetycznego dla 50 pełnych pokoleń (z metodą selekcji: {selection_type}):")
-    farm.simulate_farm(genetic_result)
-    farm.display_solution()
+    # print(f"Wynik z algorytmu genetycznego dla 50 pełnych pokoleń (z metodą selekcji: {selection_type}):")
+    #farm.simulate_farm(genetic_result)
+    # farm.display_solution()
 
     beast_genetic_result = [i[:-1] for i in beast_genetic_result]
     beast_genetic_result = zip(*beast_genetic_result[::])
     beast_genetic_result = list(beast_genetic_result)
-    print(
-        f"Najlepszy rozwiązanie który pojawiło się w trakcie trwania algorytmu genetycznego z metodą selekcji: {selection_type} (w {beast_generation_number} generacjach ) :")
-    farm.simulate_farm(beast_genetic_result)
-    farm.display_solution()
+    # print(
+    #     f"Najlepszy rozwiązanie który pojawiło się w trakcie trwania algorytmu genetycznego z metodą selekcji: {selection_type} (w {beast_generation_number} generacjach ) :")
+    # farm.simulate_farm(beast_genetic_result)
+    # farm.display_solution()
 
     farm.simulate_farm(genetic_result)
+    #zwracam najlepsze rozwiązanie
+    farm.simulate_farm(beast_genetic_result)
     return farm.earnings

@@ -251,9 +251,23 @@ class FarmGUI(Window):
 
         try:
             if sender.text() == "&genetic roule":
-                wynik = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, 11, "roulette")
+                if Y + N < 5:
+                    amount_chromoses = 5
+                elif abs(Y-N) < 4:
+                    amount_chromoses = Y+N+1
+                elif min([Y, N]) > 4:
+                    amount_chromoses = min([Y, N])*2+4
+                else:
+                    amount_chromoses = 5
+                wynik = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "roulette")
             elif sender.text() == "&genetic rank":
-                wynik = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, 11, "rank")
+                if Y + N < 5:
+                    amount_chromoses = 5
+                elif abs(Y - N) < 4:
+                    amount_chromoses = Y + N + 1
+                else:
+                    amount_chromoses = 5
+                wynik = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "rank")
             self.resultEdt.setText(str(round(wynik, 3)))
         except ValueError:
             QMessageBox.warning(self, "Błąd", "Błędne dane", QMessageBox.Ok)
