@@ -8,7 +8,7 @@ from copy import deepcopy
 Earnings = NewType('Earnings', dict)
 Degradation = NewType('Degradation', dict)"""
 
-PLANTS = ['potato', 'wheat', 'rye', 'triticale', 'EMPTY']
+PLANTS = ['potato', 'wheat', 'rye', 'triticale', 'pickled_corn', 'corn', 'rape', 'EMPTY']
 MQ = 100  # Maksymalna jakość gleby
 
 """
@@ -125,7 +125,9 @@ class FarmSimulation:
             if self.curr_year != 0:
                 # odjęcie jakości po uprawie rośliny w tym roku od jakości z poprzedniego roku
                 self.Q[self.curr_year][i] = self.Q[self.curr_year - 1][i] - self.plantInfluenceDict[
-                    self.decisionMatrix[self.curr_year - 1][i]]
+                    self.decisionMatrix[self.curr_year - 1][i]] if self.decisionMatrix[self.curr_year - 1][i] != 'EMPTY' \
+                    else self.Q[self.curr_year - 1][i] - self.plantInfluenceDict[
+                    self.decisionMatrix[self.curr_year - 1][i]](self.Q[self.curr_year - 1][i])
 
                 # zabezpieczenie przed spadkiem jakości poniżej dolnej granicy (<0)
                 if self.Q[self.curr_year][i] < 0:
@@ -179,19 +181,30 @@ class FarmSimulation:
                 pred_qual = self.Q[0][no_field] if y_dec == 0 else self.Q[self.curr_year - 1][no_field] - \
                                                                    self.plantInfluenceDict[
                                                                        self.decisionMatrix[self.curr_year - 1][
-                                                                           no_field]]
+                                                                           no_field]] if \
+                self.decisionMatrix[self.curr_year - 1][
+                    no_field] != 'EMPTY' else self.Q[self.curr_year - 1][no_field] - \
+                                              self.plantInfluenceDict[
+                                                  self.decisionMatrix[self.curr_year - 1][
+                                                      no_field]](self.Q[self.curr_year - 1][no_field])
                 best_plant, best_income = 'NONE', -math.inf
 
                 for plant in PLANTS:
-                    if 0 <= (pred_qual - self.plantInfluenceDict[plant]) <= MQ:
-                        if plant == 'EMPTY':
-                            plant_inc = (self.fieldsSurfacesList[no_field] * self.earningsMatrix[plant][
-                                math.ceil(pred_qual)])
 
-                            if y_dec > 0 and plant == self.decisionMatrix[y_dec - 1][no_field]:
-                                plant_inc = 0
+                    if plant == 'EMPTY':
+                        if y_dec != 0:
+                            if not 0 <= (pred_qual - self.plantInfluenceDict[plant](self.Q[y_dec - 1][no_field])) <= MQ:
+                                break
+                        plant_inc = (self.fieldsSurfacesList[no_field] * self.earningsMatrix[plant][
+                            math.ceil(pred_qual)])
 
-                        elif y_dec == 0 or (y_dec > 0 and plant != self.decisionMatrix[y_dec - 1][no_field]):
+                        if y_dec > 0 and plant == self.decisionMatrix[y_dec - 1][no_field]:
+                            plant_inc = 0
+                        if plant_inc > best_income:
+                            best_plant, best_income = plant, plant_inc
+                    elif 0 <= (pred_qual - self.plantInfluenceDict[plant]) <= MQ and plant != "EMPTY":
+
+                        if y_dec == 0 or (y_dec > 0 and plant != self.decisionMatrix[y_dec - 1][no_field]):
                             plant_inc = (self.fieldsSurfacesList[no_field] * self.earningsMatrix[plant][
                                 math.ceil(pred_qual)]) - (
                                                 self.productionCostDict[plant] * self.fieldsSurfacesList[no_field] +

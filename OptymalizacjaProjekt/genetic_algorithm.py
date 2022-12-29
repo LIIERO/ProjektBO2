@@ -255,7 +255,9 @@ class Genetic(object):
 
             if i != 0:
                 self.farm.Q[i][self.field_number] = self.farm.Q[i - 1][self.field_number] - \
-                                                    self.farm.plantInfluenceDict[decisons[i - 1]]
+                                                    self.farm.plantInfluenceDict[decisons[i - 1]] \
+                                                    if decisons[i - 1] != "EMPTY" else self.farm.Q[i - 1][self.field_number] - \
+                                                    self.farm.plantInfluenceDict[decisons[i - 1]](self.farm.Q[i - 1][self.field_number])
 
                 if self.farm.Q[i][self.field_number] < 0:
                     raise IndexError
