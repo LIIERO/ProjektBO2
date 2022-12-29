@@ -1,10 +1,11 @@
+from data import *
+import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QApplication, QStackedWidget
 
 import genetic_algorithm
 from farm_simulation import PLANTS, FarmSimulation
-
 
 class Window(QWidget):
     def __init__(self, parent=None):
@@ -30,14 +31,17 @@ class Window(QWidget):
 
 
 class InitWindow(Window): # Nie dokończone
-    def __init__(self, default_N, default_Y, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.start_interface_size()
+        self.fieldEdt = QLineEdit()
+        self.yearEdt = QLineEdit()
 
-        self.N, self.Y = default_N, default_Y
+        self.N, self.Y = None, None
         self.set_default = True
 
-    def start_interface_size(self):
+        self.interface()
+
+    def interface(self):
         LayoutT = QGridLayout()
 
         label1 = QLabel("Podaj liczbę pól:", self)
@@ -45,10 +49,10 @@ class InitWindow(Window): # Nie dokończone
         LayoutT.addWidget(label1, 0, 0)
         LayoutT.addWidget(label2, 0, 1)
 
-        fieldEdt = QLineEdit()
-        yearEdt = QLineEdit()
-        LayoutT.addWidget(fieldEdt, 1, 0)
-        LayoutT.addWidget(yearEdt, 1, 1)
+        self.fieldEdt.setText(str(default_N))
+        self.yearEdt.setText(str(default_Y))
+        LayoutT.addWidget(self.fieldEdt, 1, 0)
+        LayoutT.addWidget(self.yearEdt, 1, 1)
 
         continueBtn = QPushButton("&Kontynuuj", self)
         skipBtn = QPushButton("&Ustaw domyślne parametry", self)
@@ -57,21 +61,82 @@ class InitWindow(Window): # Nie dokończone
 
         self.setLayout(LayoutT)
 
-        skipBtn.clicked.connect(self.end)
-        self.N = fieldEdt.text()
-        self.Y = yearEdt.text()
+        continueBtn.clicked.connect(self.cont)
+        skipBtn.clicked.connect(self.skip)
 
         self.setGeometry(50, 50, 300, 100)
         self.setWindowIcon(QIcon('field.jpg'))
         self.setWindowTitle("Symulator gospodarstwa")
-        self.show()
+        # self.show()
+
+    @staticmethod
+    def skip():
+        global N, Y
+        N, Y = default_N, default_Y
+        widget.setCurrentWidget(okno)
+
+    def cont(self):
+        global N, Y
+        self.set_default = False
+        self.N = self.fieldEdt.text()
+        self.Y = self.yearEdt.text()
+
+        try:
+            N = int(self.N)
+            Y = int(self.Y)
+            if N < 1 or N > MAXN or Y < 1 or Y > MAXY: raise ValueError
+            okno_init2.interface() # Interfejs następnego okna wywołany dopiero jak ustalone N
+            widget.setCurrentWidget(okno_init2)
+        except ValueError:
+            QMessageBox.warning(self, "Błąd", "Błędne dane", QMessageBox.Ok)
+
+
+class Init2Window(Window):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.surfaceEdt, self.distanceEdt, self.qualityEdt = None, None, None
+
+    def interface(self):
+        self.surfaceEdt = [QLineEdit() for _ in range(N)]
+        self.distanceEdt = [QLineEdit() for _ in range(N)]
+        self.qualityEdt = [QLineEdit() for _ in range(N)]
+
+        LayoutT = QGridLayout()
+
+        label1 = QLabel("Podaj powierzchnie każdego pola [ha]:", self)
+        label2 = QLabel("Podaj dystanse do każdego pola [km]:", self)
+        label3 = QLabel("Podaj początkowe jakości gleby [int 1 -> 99]:", self)
+        LayoutT.addWidget(label1, 0, 0)
+        LayoutT.addWidget(label2, 1, 0)
+        LayoutT.addWidget(label3, 2, 0)
+
+        for n, _ in enumerate(self.surfaceEdt): LayoutT.addWidget(self.surfaceEdt[n], 0, n+1)
+        for n, _ in enumerate(self.distanceEdt): LayoutT.addWidget(self.distanceEdt[n], 1, n+1)
+        for n, _ in enumerate(self.qualityEdt): LayoutT.addWidget(self.qualityEdt[n], 2, n+1)
+
+        continueBtn = QPushButton("&Kontynuuj", self)
+        LayoutT.addWidget(continueBtn, 3, 0)
+
+        self.setLayout(LayoutT)
+
+        continueBtn.clicked.connect(self.cont)
+
+        # continueBtn.clicked.connect(self.cont)
+
+        self.setGeometry(50, 50, 300, 100)
+        self.setWindowIcon(QIcon('field.jpg'))
+        self.setWindowTitle("Symulator gospodarstwa")
+        # self.show()
+
+    def cont(self):
+        widget.setCurrentWidget(okno)
 
 
 class FarmGUI(Window):
-    def __init__(self, default_N, default_Y, T, default_P, default_D, C, W, G, default_b, parent=None):
-        self.N, self.Y, self.P, self.D, self.b = default_N, default_Y, default_P, default_D, default_b
-        self.resultEdt = None # Tylko deklaracja
+    def __init__(self, def_N, def_Y, def_P, def_D, def_b, parent=None):
+        self.N, self.Y, self.P, self.D, self.b = def_N, def_Y, def_P, def_D, def_b
 
+        self.resultEdt = QLineEdit()
         self.sim = FarmSimulation(self.N, self.Y, T, self.P, self.D, C, W, G, self.b)
 
         super().__init__(parent)
@@ -93,7 +158,6 @@ class FarmGUI(Window):
         # 1-liniowe pola edycyjne
         fieldEdt = QLineEdit()
         yearEdt = QLineEdit()
-        self.resultEdt = QLineEdit()
 
         self.resultEdt.readonly = True
         self.resultEdt.setToolTip('Wpisz wszystkie parametry i wybierz interesujący algorytm...')
@@ -132,7 +196,7 @@ class FarmGUI(Window):
         self.setGeometry(50, 50, 300, 100)
         self.setWindowIcon(QIcon('field.jpg'))
         self.setWindowTitle("Symulator gospodarstwa")
-        self.show()
+        # self.show()
 
     def annealing(self):
         greedy_s = self.sim.solve_greedy()
@@ -159,3 +223,12 @@ class FarmGUI(Window):
     def greedy(self):
         self.sim.solve_greedy()
         self.resultEdt.setText(str(round(self.sim.earnings, 3)))
+
+N, Y = None, None
+
+app = QApplication(sys.argv)
+widget = QStackedWidget()
+
+okno_init = InitWindow()
+okno_init2 = Init2Window()
+okno = FarmGUI(default_N, default_Y, default_P, default_D, default_b)
