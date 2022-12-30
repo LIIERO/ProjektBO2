@@ -19,13 +19,13 @@ W = {'potato': 4, 'wheat': 9, 'rye': 2, 'triticale': 5, 'pickled_corn': 3, 'corn
 G = {'potato': [], 'wheat': [], 'rye': [], 'triticale': [], 'pickled_corn': [], 'corn': [], 'rape': [], 'EMPTY': []}
 MQ = 100  # Maksymalna jakość gleby
 for i in range(MQ):
-        G['potato'].append(0 if i < 10 else (math.e ** ((i - 10) / 10) / 8103.08 * 13 + 28) * 650 + 1259.42)
-        G['wheat'].append(0 if i < 38 else (math.e ** ((i - 38) / 10) / 492.75 * 10 + 3.9) * 1509.5 + 1259.42)
-        G['rye'].append((math.e ** (i / 10) / 22026.47 * 5.5 + 2.1) * 1199.4 + 1259.42)
-        G['triticale'].append(0 if i < 20 else (math.e ** ((i - 20) / 10) / 2980.96 * 9 + 3) * 1412.2 + 1259.42)
-        G['pickled_corn'].append(0 if i < 20 else (math.e**((i-20) / 10)/2980.96 * 50 + 30)*200+1609.42)
-        G['corn'].append(0 if i < 25 else (math.e**((i-25)/10)/1808.04*8.5 + 3.2)*1800 + 1109.42)
-        G['rape'].append(0 if i < 10 else (math.e**((i-10)/10)/8103.08*4.5 + 1.7)*2650 + 1609.42)
+        G['potato'].append(0 if i < 10 else (math.log((i-10)/10+1, 10) * 1.3**((i-10)/10) / 1.3**9 * 13 + 28) * 650 + 1259.42)
+        G['wheat'].append(0 if i < 38 else (math.log((i-38)/10+1, 7.2) * 1.3**((i-7.2)/10) / 1.3**6.2 * 10 + 3.9) * 1509.5 + 1259.42)
+        G['rye'].append((math.log(i/10+1, 11) * 1.3**(i/10) / 1.3**10 * 5.5 + 2.1) * 1199.4 + 1259.42)
+        G['triticale'].append(0 if i < 20 else (math.log((i-20)/10+1, 9) * 1.3**((i-20)/10) / 1.3**8 * 9 + 3) * 1412.2 + 1259.42)
+        G['pickled_corn'].append(0 if i < 20 else (math.log((i-20)/10+1, 9) * 1.3**((i-20)/10) / 1.3**8 * 50 + 30)*200+1609.42)
+        G['corn'].append(0 if i < 25 else (math.log((i-25)/10+1, 8.5) * 1.3**((i-25)/10) / 1.3**7.5 * 8.5 + 3.2)*1800 + 1109.42)
+        G['rape'].append(0 if i < 10 else (math.log((i-10)/10+1, 10) * 1.3**((i-10)/10) / 1.3**9 * 4.5 + 1.7)*2650 + 1609.42)
         G['EMPTY'].append(40)
 
 # Dane dowolne:
