@@ -233,11 +233,17 @@ class FarmSimulation:
 
         best_s = deepcopy(s0)  # Rozwiązanie najlepsze
         s = deepcopy(s0)  # Rozwiązanie początkowe
+        solutions = [self.simulate_farm(s0)] + [-1]*(k_max - 1) # Lista będąca zapisem przebiegu wartości rozwiązań do wyświetlenia na wykresie
+        best_solutions = [-1]*k_max # Wartość najlepszego rozwiązania w każdej iteracji
 
         for k in range(k_max):
+            best_solutions[k] = self.simulate_farm(best_s)  # Zapis najlepszego rozwiązania w każdej iteracji
+
             # przypisywanie nowej temperatury co iteracje
             T = self.__annealing_temp(1 - ((k + 1) / k_max), k_max)
             s_new = self.__annealing_neig(s)
+
+            solutions[k] = self.simulate_farm(s_new)  # Zapis rozwiązania w każdej iteracji
 
             if self.simulate_farm(s_new) > self.simulate_farm(best_s):
                 best_s = s_new
@@ -245,7 +251,7 @@ class FarmSimulation:
             if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
                 s = deepcopy(s_new)
 
-        return best_s
+        return best_s, solutions, best_solutions
 
     @staticmethod
     def __annealing_temp(inp, k_max):

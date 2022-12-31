@@ -1,5 +1,5 @@
 from data import *
-import sys
+import sys, os
 import random
 import matplotlib.pyplot as plt
 import numpy as np
@@ -153,6 +153,9 @@ class Init2Window(Window):
 class FarmGUI(Window):
     def __init__(self, parent=None):
         # self.N, self.Y, self.P, self.D, self.b = def_N, def_Y, def_P, def_D, def_b
+        self.current_algorithm = None # Jakim algorytmem zostało wyznaczone aktualne rozwiązanie
+        self.solutions = []
+        self.best_solutions = []
 
         self.resultEdt = QLineEdit()
         self.anIterEdt = QLineEdit()
@@ -178,12 +181,6 @@ class FarmGUI(Window):
         self.resultEdt.readonly = True
         self.resultEdt.setToolTip('Wpisz wszystkie parametry i wybierz interesujący algorytm...')
         self.resultEdt.resize(self.resultEdt.sizeHint())
-
-        rozwinitBtn = QPushButton("&rozw. początkowe", self)
-        rozwbestBtn = QPushButton("&rozw. najlepsze", self)
-
-        LayoutT.addWidget(rozwinitBtn, 1, 0)
-        LayoutT.addWidget(rozwbestBtn, 1, 1)
         LayoutT.addWidget(self.resultEdt, 1, 2)
 
         # przyciski
@@ -206,13 +203,22 @@ class FarmGUI(Window):
         LayoutT.addWidget(self.anIterEdt, 3, 1)
         self.anIterEdt.setText(str(1000))
 
-        LayoutT.addWidget(endBtn, 4, 0, 1, 3)
+        LayoutT.addWidget(endBtn, 5, 0, 1, 3)
+
+        # rozwinitBtn = QPushButton("&rozw. początkowe", self)
+        # rozwbestBtn = QPushButton("&rozw. najlepsze", self)
+        showgraphBtn = QPushButton("&wyświetl przebieg rozwiązań (tylko annealing)", self)
+
+        # LayoutT.addWidget(rozwinitBtn, 1, 0)
+        # LayoutT.addWidget(rozwbestBtn, 1, 1)
+        LayoutT.addWidget(showgraphBtn, 4, 0, 1, 3)
+
+        # rozwinitBtn.clicked.connect(self.show_begin_solution)
+        # rozwbestBtn.clicked.connect(self.show_best_solution)
+        showgraphBtn.clicked.connect(self.display_solution_graph)
 
         # przypisanie utworzonego układu do okna
         self.setLayout(LayoutT)
-
-        rozwinitBtn.clicked.connect(self.show_begin_solution)
-        rozwbestBtn.clicked.connect(self.show_best_solution)
 
         endBtn.clicked.connect(self.end)
         greedyBtn.clicked.connect(self.greedy)
@@ -222,13 +228,21 @@ class FarmGUI(Window):
 
         # self.setGeometry(50, 50, 300, 100)
 
-    def show_begin_solution(self): # Nie zaimplementowane
-        pass
-        # for row in self.sim.decisionMatrix:
-        #     print(row)
+    def show_best_solution(self):
+        if self.current_algorithm:
+            os.system('cls')
+            print(f"Rozwiązanie wyznaczone algorytmem {self.current_algorithm}.\n")
+            self.sim.display_solution()
 
-    def show_best_solution(self): # Nie zaimplementowane
-        pass
+    def display_solution_graph(self):
+        if self.current_algorithm == 'annealing':
+            plt.plot(self.solutions)
+            plt.plot(self.best_solutions)
+            plt.legend(['kolejne rozwiązania', 'najlepsze rozwiązania'])
+            plt.title('Przebieg rozwiązań')
+            plt.show()
+        else:
+            QMessageBox.warning(self, "Błąd", "Przebieg tylko dla wyżarzania", QMessageBox.Ok)
 
     def annealing(self):
         try:
@@ -236,11 +250,13 @@ class FarmGUI(Window):
             if it < 1 or it > MAX_AN_ITER: raise ValueError
 
             greedy_s = self.sim.solve_greedy()
-            sol = self.sim.simulated_annealing(greedy_s, it)
+            sol, solutions, best_solutions = self.sim.simulated_annealing(greedy_s, it)
+            self.solutions, self.best_solutions = solutions, best_solutions
             self.sim.simulate_farm(sol)
 
             self.resultEdt.setText(str(round(self.sim.earnings, 3)))
-
+            self.current_algorithm = 'annealing'
+            self.show_best_solution()
         except ValueError:
             QMessageBox.warning(self, "Błąd", "Błędne dane", QMessageBox.Ok)
 
@@ -269,12 +285,16 @@ class FarmGUI(Window):
                     amount_chromoses = 8
                 wynik = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "rank")
             self.resultEdt.setText(str(round(wynik, 3)))
+            self.current_algorithm = 'genetic'
+            self.show_best_solution()
         except ValueError:
             QMessageBox.warning(self, "Błąd", "Błędne dane", QMessageBox.Ok)
 
     def greedy(self):
+        self.current_algorithm = 'greedy'
         self.sim.solve_greedy()
         self.resultEdt.setText(str(round(self.sim.earnings, 3)))
+        self.show_best_solution()
 
 N, Y = 0, 0
 P, D, b = [], [], []
