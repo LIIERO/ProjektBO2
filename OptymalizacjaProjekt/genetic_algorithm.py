@@ -280,14 +280,14 @@ class Genetic(object):
         return earnings
 
 
-def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chromosome, selection_type="roulette"):
+def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chromosome, selection_type="roulette", generation_quantity = 50):
     greedy_result = farm.solve_greedy()  # rozwiązanie konstrukcyjne
     j = 0
     farm.earnings = 0
     genetic_result = []
     beast_genetic_result = []
     beast_generation_number = []
-    income_in_each_generation = [None for _ in range(50)]
+    income_in_each_generation = [None for _ in range(generation_quantity)]
 
     for i in list(zip(*greedy_result[::-1])):  # transpozycja macierzy wyników greddy
         i = deepcopy(list(i))
