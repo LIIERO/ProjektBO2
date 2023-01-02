@@ -266,7 +266,7 @@ class FarmGUI(Window):
         wynik = ""
 
         try:
-            generation_quantities = int((N * Y)*25)
+            generation_quantities = int(Y*25)
             print(generation_quantities)
             if sender.text() == "&genetic roule":
                 if Y + N < 3:

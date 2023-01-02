@@ -235,22 +235,26 @@ class FarmSimulation:
         s = deepcopy(s0)  # Rozwiązanie początkowe
         solutions = [self.simulate_farm(s0)] + [-1]*(k_max - 1) # Lista będąca zapisem przebiegu wartości rozwiązań do wyświetlenia na wykresie
         best_solutions = [self.simulate_farm(s0)] + [-1]*(k_max-1) # Wartość najlepszego rozwiązania w każdej iteracji
+        i = 1
         for k in range(k_max-1, 0, -1):
 
-            best_solutions[k] = self.simulate_farm(best_s)  # Zapis najlepszego rozwiązania w każdej iteracji
+
 
             # przypisywanie nowej temperatury co iteracje
             T = self.__annealing_temp(k, k_max)
             s_new = self.__annealing_neig(s)
 
-            solutions[k] = self.simulate_farm(s_new)  # Zapis rozwiązania w każdej iteracji
+            solutions[i] = self.simulate_farm(s_new)  # Zapis rozwiązania w każdej iteracji
 
             if self.simulate_farm(s_new) > self.simulate_farm(best_s):
                 best_s = deepcopy(s_new)
 
             if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
                 s = deepcopy(s_new)
-
+            best_solutions[i] = self.simulate_farm(s)  # Zapis najlepszego rozwiązania w każdej iteracji
+            if best_solutions[i] < best_solutions[i-1]:
+                print(f"wyżarzanie {k}")
+            i += 1
         return best_s, solutions, best_solutions
 
     @staticmethod
