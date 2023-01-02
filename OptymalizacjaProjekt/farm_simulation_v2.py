@@ -315,5 +315,5 @@ class FarmSimulation:
         if e_new > e:
             return 1
         else:
-            return np.exp(((-1) * (e - e_new)) / temp)
+            return np.exp((e_new-e) / temp)
 
