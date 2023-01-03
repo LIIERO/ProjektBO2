@@ -8,7 +8,7 @@ PLANTS = ['potato', 'wheat', 'rye', 'triticale', 'EMPTY']
 MQ = 100  # Maksymalna jakość gleby
 
 
-class FarmSimulation:
+class FarmSimulation(object):
     """
     fieldNumber, N - Liczba dostępnych pól uprawnych.
     yearsNumber, Y - Liczba lat planowania upraw.

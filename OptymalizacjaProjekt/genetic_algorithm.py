@@ -8,14 +8,25 @@ import farm_simulation
 
 class Genetic(object):
     def __init__(self, chromosome, plants, field_number, farm: farm_simulation.FarmSimulation):
+        """
+
+        :param chromosome:
+        :param plants:
+        :param field_number:
+        :param farm:
+        """
         self.chromosome = chromosome
         self.farm = farm
-        self.plants = plants
-        self.field_number = field_number
-        self.beast_chromosome = list([-np.inf])
+        self.plants: list[str] = plants
+        self.field_number: int = field_number
+        self.best_chromosome = list([-np.inf])
         self.best_generation_number = 0
 
-    def initial_result(self):  # inicjalizacja generacji 0
+    def initial_result(self):  #
+        """inicjalizacja generacji 0
+
+        :return: None
+        """
 
         chromosome = deepcopy(self.chromosome)
         # kopia pierrwszego chromosomu do którego będziemy dodawać zysk tego chromosomu
@@ -70,26 +81,36 @@ class Genetic(object):
 
         self.chromosome = chromosome  # zapisanie wygenerowanych chromosomó do modelu
 
-    def selection_rank(self, generation_number):  # selekcja metodą rankingową
+    def selection_rank(self, generation_number):  #
+        """selekcja metodą rankingową
+
+        :param generation_number:
+        :return:
+        """
         self.chromosome.sort(key=lambda x: x[-1])  # sortowanie chromosomów w danej generacji
 
-        if self.beast_chromosome[-1] < self.chromosome[-1][
+        if self.best_chromosome[-1] < self.chromosome[-1][
             -1]:  # sprawdzenie czy najlepszy z chromosomów w danej generacji jest najlepszy w całej populacji
-            self.beast_chromosome = deepcopy(self.chromosome[-1])
+            self.best_chromosome = deepcopy(self.chromosome[-1])
             self.best_generation_number = generation_number
 
         chromosomes = deepcopy([i[:-1] for i in self.chromosome])  # wycięcie zysków dla danego chromosomu
 
         return chromosomes[-1], chromosomes[-2]  # wybór dwóch najlepszych wyników
 
-    def selection_roulette(self, generation_number):  # selekcja metodą ruletki
+    def selection_roulette(self, generation_number):  #
+        """selekcja metodą ruletki
+
+        :param generation_number:
+        :return:
+        """
         list_value_chromosome = [i[-1] for i in self.chromosome]  # wykonanie listy z zysków kolejnych chromosomów
         max_val = max(list_value_chromosome)  # poszukiwania najwiękzej wielkości w liście
         max_index = list_value_chromosome.index(max_val)  # poszukiwanie indeksu największej wartości
 
-        if self.beast_chromosome[
+        if self.best_chromosome[
             -1] < max_val:  # sprawdzenie czy wartość najlepszego chromosomu w generacji jest najlepsza w całej populacji
-            self.beast_chromosome = deepcopy(self.chromosome[max_index])
+            self.best_chromosome = deepcopy(self.chromosome[max_index])
             self.best_generation_number = generation_number
 
         min_earnings = min(list_value_chromosome)  # znalezienie najmniejszej wartości w liście zysków
@@ -125,7 +146,13 @@ class Genetic(object):
 
         return parent
 
-    def crossover(self, selection, selection_type):  # procedura krzyżowania
+    def crossover(self, selection, selection_type):
+        """procedura krzyżowania
+
+        :param selection:
+        :param selection_type:
+        :return:
+        """
         sel = deepcopy(selection)
         flag = False
         children = []
@@ -191,6 +218,11 @@ class Genetic(object):
         return children
 
     def mutation(self, crossover):  # procedura mutacji
+        """
+
+        :param crossover:
+        :return:
+        """
         mutation = deepcopy(crossover)
         mutation_out = list(mutation[0])
         j = 0
@@ -316,7 +348,7 @@ def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chrom
                 break
 
         beast_generation_number.append(genetic.best_generation_number)
-        beast_genetic_result.append(genetic.beast_chromosome)
+        beast_genetic_result.append(genetic.best_chromosome)
         j += 1
 
     genetic_result = [i[:-1] for i in genetic_result]

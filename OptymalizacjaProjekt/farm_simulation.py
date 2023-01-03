@@ -28,7 +28,7 @@ S - Słownik zamieniający nazwę roślny na przydzielony jej indeks
 """
 
 
-class FarmSimulation:
+class FarmSimulation(object):
     """ Klasa symulująca gospodarstwo w problemie
 
     """
