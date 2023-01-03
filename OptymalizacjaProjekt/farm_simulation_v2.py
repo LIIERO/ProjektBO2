@@ -216,13 +216,15 @@ class FarmSimulation(object):
         self.__reset_variables()
         best_s = deepcopy(s0) # Rozwiązanie najlepsze (rozwiązanie bestialskie)
         s = deepcopy(s0) # Rozwiązanie początkowe
-
+        solutions = [self.simulate_farm(s0)] + [-1] * (
+                    k_max - 1)  # Lista będąca zapisem przebiegu wartości rozwiązań do wyświetlenia na wykresie
+        i = 1
         for k in range(k_max):
             if k_max >= 0.99**k:
                 year = random.randrange(self.yearsNumber)
                 field = random.randrange(self.fieldNumber)
                 T = self.__annealing_temp(k, k_max)
-
+                solutions[i] = self.simulate_farm(s)
                 # kilka podejść na temperaturę ( epokę )
                 for _ in range(stages):
                     s_new = self.__annealing_neig(s, k_max, T, year, field)
@@ -237,8 +239,8 @@ class FarmSimulation(object):
 
             else:
                 break
-
-        return best_s
+            i += 1
+        return best_s, solutions
 
     @staticmethod
     def __annealing_temp(inp, k_m): # Funkcja obliczająca temperaturę
