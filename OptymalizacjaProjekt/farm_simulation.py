@@ -252,8 +252,7 @@ class FarmSimulation:
             if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new), T) >= random.uniform(0, 1):
                 s = deepcopy(s_new)
             best_solutions[i] = self.simulate_farm(s)  # Zapis najlepszego rozwiązania w każdej iteracji
-            if best_solutions[i] < best_solutions[i-1]:
-                print(f"wyżarzanie {k}")
+
             i += 1
         return best_s, solutions, best_solutions
 
