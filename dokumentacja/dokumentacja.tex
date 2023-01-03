@@ -188,7 +188,7 @@ Poniżej przedstawiamy prosty pseudokod obrazujący główne założenia symulow
 \newpage
 
 \begin{algorithmic}
-\Function{SimulatedAnnealingMin}{$ $}
+\Function{SimulatedAnnealingMax}{$ $}
 \State $T\gets T_{max}$
 \State $best\gets$ \textbf{\Call{\color{blue}S}{0}}
 
@@ -204,10 +204,10 @@ Poniżej przedstawiamy prosty pseudokod obrazujący główne założenia symulow
 \end{algorithmic}
 
 
-\subsubsection{metody algorytmu}
-\paragraph{wersja pierwsza}
-Aby zaimplementować nasze rozwiązanie metaheurystyką symulowanego wyżarzania potrzebowaliśmy zdefiniować następujące funkcje:
 
+\subsubsection{wersja pierwsza}
+Aby zaimplementować nasze rozwiązanie metaheurystyką symulowanego wyżarzania potrzebowaliśmy zdefiniować następujące funkcje:
+\paragraph{metody algorytmu}
 \begin{itemize}
 	\item \begin{verbatim}
 		simulated_annealing
@@ -236,51 +236,39 @@ Funkcja pomocnicza akceptująca następujące parametry: wartość f. celu dla o
 Jako że maksymalizujemy to funkcja zwraca 1 jeżeli nowe rozwiązanie ma wyższą wartość niż obecne, zaś w przeciwnym wypadku jest wyliczane według wzoru: $ exp( (-1)* (f - f_{new}) / temp ) $.
 
 \paragraph{annealing neighbour}
-Funkcja pomocnicza wybierająca kandydata na nowe rozwiązanie. Kandydat jest macierzą (\hyperref[postac_rozw]{wyjaśnienie tutaj}) w której zmieniono w randomowy sposób jedną roślinę (randomowo dobieramy rok i pole, czyli pozycję w macierzy). Roślina na jaką zamieniamy to pole w macierzy wybieramy randomowo z listy roślin z wykluczeniem poprzedniej na tej pozycji.
+Funkcja pomocnicza wybierająca kandydata z sąsiedztwa na nowe rozwiązanie. Jako że kandydat ma być w sąsiedztwie poprzedniego rozwiązania jest on więc macierzą (\hyperref[postac_rozw]{wyjaśnienie tutaj})(poprzednie rozwiązanie) w której zmieniono w losowy sposób jedną roślinę (losowo dobieramy rok i pole, czyli pozycję w macierzy). Roślina na jaką zamieniamy to pole w macierzy wybieramy losowo z listy roślin z wykluczeniem poprzedniej na tej pozycji.
 Funkcja wykorzystuje model uzyskany dla algorytmu zachłannego do sprawdzenia czy nowe rozwiązanie nadaje się do symulacji, tzn. czy nie wyskoczy żaden błąd przy próbie odpalenia simulate farm, zaś jeżeli wyskoczy rekurencyjne powtórzenie funkcji.
 
 \paragraph{simulated annealing}
-Jest to główna funkcja zaimplementowanego algorytmu realizująca przedstawiony pseudokod. Cała funkcja skupia się na pętli for w której dokonujemy chłodzenia naszej temperatury
+Jest to główna funkcja zaimplementowanego algorytmu realizująca przedstawiony pseudokod. Cała funkcja skupia się na pętli for w której dokonujemy chłodzenia naszej temperatury oraz za pomocą wyżej opisanej funkcji annealing neig  wybieramy sąsiednie rozwiązanie i dla tak dobranego rozwiązania za pomocą funkcji annealing P ustalamy prawdopodobieństwo wyboru tego rozwiązania jako rozwiązania do kolejnych etapów. W ramach implementacji tej metody napotkaliśmy na problem w postaci doboru takiego zakresu temperatury by rzeczywiście algorytm z niezerowym prawdopodobieństwem wybierał rozwiązanie gorsze w momencie gdy utknie w jakimś maksimum lokalnym
 
 
-\paragraph{wersja druga}
-Drugie podejście charakteryzowało się innym podejściem do zmian temperatury
-inne podejście do epoki (iteracji po jednej temperaturze), może mieć kilka prób dla jednej epoki,
-zmiana podejścia do sąsiedztwa w kontekście jednej epoki
+\subsubsection{wersja druga}
+Tak jak wspominaliśmy już wcześniej postanowiliśmy zrealizować symulowane wyżarzanie na dwa sposoby. Jako że druga metoda bazuje na pierwszej, powstrzymujemy się więc od szczegółowego opisu każdej z funkcji, bowiem są one już wytłumaczone wyżej i ograniczamy się jedynie do wskazania róźnic w stosunku do poprzedniego podejścia. Wersja ta w ogólności charakteryzuje się innym podejściem do zmian temperatury, podejmowaniem kilku prób dla jednej epoki oraz
+zmianom podejścia do sąsiedztwa (jedynie w kontekście jednej epoki).
 
+\paragraph{annealing temperature}
+ W podejściu tym metoda ta zwraca temperature zgodną z wynikiem działania $T = T_{max} * 0.99^{inp}$ gdzie inp to numer kolejnej epoki.
 
+ \paragraph{annealing Probability}
+ W tej metodzie nie nastąpiła żadna zmiana w stosunku do poprzedniej wersji.
 
+ \paragraph{annealing neighbour}
+ Dla tej metody nastąpiły największe zmiany, bowiem tym razem dla jednej temperatury podejmuje kilka prób. Dlatego żeby podejmowanie kolejnych prób nie sprowadziło się jedynie do zwiększenia ilości przeanalizowanych rozwiązań dla danej epoki, uznaliśmy że uzaleźnimy losowania w kontekście jednej epoki od tychże epok. W ten sposób dla pierwszej próby w danej epoce dalej losuje sąsiedne rozwiązanie z całego zakresu macierzy (wszystkich lat i pól), jednak dla kolejnych prób zakres ten jest ograniczony do "pobliża" poprzednio wylosowanych parametrów (zakres ten jest tym większy im wyższa jest temperatura). Zrealizowane jest to w takich sposób że dla każdej próby dostajemy wylosowany uprzednio numer pola i rok, następnie odejmujemy od i dodajemy do parametrów wartość $T*maxnumber/(2*T_{max})$ (gdzie $T$ to temperatura , $T_{max}$ to maksymalna temperatura, a $maxnumber$ jest maksymalną dozwoloną liczbą lat lub pól) i w ten sposób otrzymany zakres wraz z temperaturą wrzucamy do specjalnie stworzonej do tego metody:
+ \begin{verbatim}
+		__range_builder
+	\end{verbatim}
+ której działanie opiszemy poniżej, jednakże dla opisywanej tutaj metody ważne jest tylko to że zwraca ona nam tutaj zakres z którego następnie będziemy losować pole w którym będzie zmieniana roślina. W dalszej części metoda ta działa niemalże identycznie jak w wersji pierwszej, jedyną róźnicą jest to że w wypadku otrzymania dla niezerowego roku rośliny której zasianie doprowadziło by do przekroczenia dolnego ograniczenia jakości pola (ponieważ na początku działania programu, w zerowym roku nie ma możliwości że jakość pola będzie ujemna) przeprowadzamy losowania innej rośliny aż do czasu gdy nie będzie przekroczone to ograniczenie (zastosowanie tej pętli jest spowodowane jest chęcią by nie losować od razu innego pola i roku, lecz zmienić roślinę na spełniającą ograniczenia, bowiem bez tej pętli algorytm potrafił wpadać w nieskończoną pętle i uniemożliwiał dalsze działanie programu). Ostatnią zmianą jest to że tym razem metoda prócz wylosowanego rozwiązania zwraca również indeks pola i roku który został zmieniony w danej próbie.
 
+ \paragraph{range builder}
+ Jest to pomocnicza metoda której zadaniem jest zwrócenie zakresu z którego będzie losowane pole w metodzie annealing neighbour. Metoda ta przyjmuje trzy parametry: wartość niższą, wyższą oraz maksymalną. W metodzie tej zmieniamy otrzymane parametry na liczby całkowite i porównujemy czy w ten sposób nie otrzymaliśmy identycznych wartości oraz czy nie wychodzą one poza dostępny zakres i dokonujemy odpowiednich działań żeby je poprawić. W ten sposób otrzymujemy poprawny zakres który zwracamy do funkcji macierzystej
 
-Algorytm działa $ k_{max} $ razy w pętli for,
-w pierwszym kroku każdej iteracji jest przypisywana nowa temperatura zwracana z funkcji annealling temp
-
-
-\paragraph{wersja druga}
-Drugie podejście charakteryzowało się innym podejściem do zmian temperatury
-
-inne podejście do epoki (iteracji po jednej temperaturze), może mieć kilka prób dla jednej epoki,
-
-zmiana podejścia do sąsiedztwa w kontekście jednej epoki
-
-głowne zalorzenie to zmniejszanie zakresu wyboru/uzaleznienie losowosci od temp
-
+\paragraph{simulated annealing}
+Jedyną różnicą wobec pierwotnej wersją jest losowanie indeksu roku i pola przed pierwszą próbą w danej epoce by móc ją przekazać do funkcji annealing neighbour oraz wprowadzenie dodatkowej pętli aby wykonać zadaną liczbę prób dla danej epoki.
 
 \subsection{algorytm genetyczny}
 
 
 \subsection{wyniki}
-
-
-
-
-
-\section{Problemy}
-Indeksacja
-
-wybór następnego kandydata na rozwiązanie
-
-
-
 
 \end{document}

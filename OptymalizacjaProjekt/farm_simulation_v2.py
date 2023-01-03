@@ -228,7 +228,7 @@ class FarmSimulation:
                     s_new = self.__annealing_neig(s, k_max, T, year, field)
 
                     if self.simulate_farm(s_new[0]) > self.simulate_farm(best_s):
-                        best_s = s_new[0]
+                        best_s = deepcopy(s_new[0])
 
                     if self.__annealing_P(self.simulate_farm(s), self.simulate_farm(s_new[0]), T) >= random.uniform(0, 1):
                         s = deepcopy(s_new[0])
