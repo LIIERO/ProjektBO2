@@ -199,7 +199,7 @@ class FarmGUI(Window):
 
         LayoutT.addLayout(LayoutH, 2, 0, 1, 3)
 
-        LayoutT.addWidget(QLabel("Iteracje wyżarzania: ", self), 3, 0)
+        LayoutT.addWidget(QLabel("Temperatura maksymalna: ", self), 3, 0)
         LayoutT.addWidget(self.anIterEdt, 3, 1)
         self.anIterEdt.setText(str(1000))
 
@@ -207,7 +207,7 @@ class FarmGUI(Window):
 
         # rozwinitBtn = QPushButton("&rozw. początkowe", self)
         # rozwbestBtn = QPushButton("&rozw. najlepsze", self)
-        showgraphBtn = QPushButton("&wyświetl przebieg rozwiązań (tylko annealing)", self)
+        showgraphBtn = QPushButton("&wyświetl przebieg rozwiązań", self)
 
         # LayoutT.addWidget(rozwinitBtn, 1, 0)
         # LayoutT.addWidget(rozwbestBtn, 1, 1)
@@ -235,14 +235,16 @@ class FarmGUI(Window):
             self.sim.display_solution()
 
     def display_solution_graph(self):
-        if self.current_algorithm == 'annealing':
+        if self.current_algorithm in ['annealing', 'genetic']:
             plt.plot(self.solutions)
             plt.plot(self.best_solutions)
             plt.legend(['kolejne rozwiązania', 'najlepsze rozwiązania'])
             plt.title('Przebieg rozwiązań')
             plt.show()
+        elif self.current_algorithm == 'greedy':
+            QMessageBox.warning(self, "Błąd", "Algorytm zachłanny nie ma przebiegu", QMessageBox.Ok)
         else:
-            QMessageBox.warning(self, "Błąd", "Przebieg tylko dla wyżarzania", QMessageBox.Ok)
+            QMessageBox.warning(self, "Błąd", "Najpierw użyj wybranego algorytmu", QMessageBox.Ok)
 
     def annealing(self):
         try:
@@ -250,9 +252,17 @@ class FarmGUI(Window):
             if it < 1 or it > MAX_AN_ITER: raise ValueError
 
             greedy_s = self.sim.solve_greedy()
-            sol, solutions, best_solutions = self.sim.simulated_annealing(greedy_s, it)
-            self.solutions, self.best_solutions = solutions, best_solutions
-            self.sim.simulate_farm(sol)
+            wynik, solutions = self.sim.simulated_annealing(greedy_s, it)
+            self.solutions = solutions
+
+            cur_best = solutions[0]
+            best_solutions = [cur_best]
+            for n, sol in enumerate(solutions):
+                if n != 0:
+                    if sol > cur_best: cur_best = sol
+                    best_solutions.append(cur_best)
+            self.best_solutions = best_solutions
+            self.sim.simulate_farm(wynik)
 
             self.resultEdt.setText(str(round(self.sim.earnings, 3)))
             self.current_algorithm = 'annealing'
@@ -267,7 +277,7 @@ class FarmGUI(Window):
 
         try:
             generation_quantities = int(Y*25)
-            print(generation_quantities)
+            # print(generation_quantities) # TODO: Zrób coś z tym
             if sender.text() == "&genetic roule":
                 if Y + N < 3:
                     amount_chromoses = 8
@@ -277,7 +287,7 @@ class FarmGUI(Window):
                     amount_chromoses = min([Y, N])*2+4
                 else:
                     amount_chromoses = 8
-                wynik = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "roulette", generation_quantities)
+                wynik, solutions = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "roulette", generation_quantities)
             elif sender.text() == "&genetic rank":
                 if Y + N < 3:
                     amount_chromoses = 8
@@ -285,8 +295,17 @@ class FarmGUI(Window):
                     amount_chromoses = Y + N + 4
                 else:
                     amount_chromoses = 8
-                wynik = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "rank", generation_quantities)
+                wynik, solutions = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "rank", generation_quantities)
             self.resultEdt.setText(str(round(wynik, 3)))
+            solutions = [el for el in solutions if el is not None]
+            self.solutions = solutions
+            cur_best = solutions[0]
+            best_solutions = [cur_best]
+            for n, sol in enumerate(solutions):
+                if n != 0:
+                    if sol > cur_best: cur_best = sol
+                    best_solutions.append(cur_best)
+            self.best_solutions = best_solutions
             self.current_algorithm = 'genetic'
             self.show_best_solution()
         except ValueError:

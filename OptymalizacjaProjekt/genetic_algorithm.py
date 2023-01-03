@@ -319,7 +319,7 @@ def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chrom
     genetic_result = []
     beast_genetic_result = []
     beast_generation_number = []
-    income_in_each_generation = [[None for _ in range(generation_quantity)] for _ in range(len(list(zip(*greedy_result[::-1]))))]
+    income_in_each_generation = [[None for _ in range(len(list(zip(*greedy_result[::-1]))))] for _ in range(generation_quantity)]
     field_number = 0
 
     for i in list(zip(*greedy_result[::-1])):  # transpozycja macierzy wyników greddy
@@ -328,7 +328,7 @@ def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chrom
         genetic = Genetic(chromosomes, plants, field_number, farm)
         genetic.initial_result()
 
-        for generation_number in range(50):
+        for generation_number in range(generation_quantity):
 
             if selection_type == "roulette":
                 selection = genetic.selection_roulette(generation_number)
@@ -340,7 +340,7 @@ def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chrom
 
             mutation = genetic.mutation(children)
             genetic.chromosome = deepcopy(mutation)
-            income_in_each_generation[field_number][generation_number] = max([io[-1] for io in genetic.chromosome])
+            income_in_each_generation[generation_number][field_number] = max([io[-1] for io in genetic.chromosome])
 
         max_earnings = max([io[-1] for io in genetic.chromosome])  # maksymalna ocena chromosomu dla ostatniej generacji
         for m in genetic.chromosome:
@@ -356,7 +356,7 @@ def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chrom
     genetic_result = [i[:-1] for i in genetic_result]
     genetic_result = zip(*genetic_result[::])
     genetic_result = list(genetic_result)
-    print(income_in_each_generation)
+
     # print(f"Wynik z algorytmu genetycznego dla 50 pełnych pokoleń (z metodą selekcji: {selection_type}):")
     #farm.simulate_farm(genetic_result)
     # farm.display_solution()
@@ -372,4 +372,5 @@ def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chrom
     farm.simulate_farm(genetic_result)
     #zwracam najlepsze rozwiązanie
     farm.simulate_farm(beast_genetic_result)
-    return farm.earnings, [sum(income_in_each_generation[t]) for t in range(len(list(zip(*greedy_result[::-1]))))]
+    # print(beast_generation_number)
+    return farm.earnings, [sum(income_in_each_generation[t][:]) for t in range(generation_quantity)]
