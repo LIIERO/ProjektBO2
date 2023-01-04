@@ -236,9 +236,13 @@ class FarmGUI(Window):
 
     def display_solution_graph(self):
         if self.current_algorithm in ['annealing', 'genetic']:
+            plt.figure(figsize=(10, 8), dpi=80)
             plt.plot(self.solutions)
             plt.plot(self.best_solutions)
             plt.legend(['kolejne rozwiązania', 'najlepsze rozwiązania'])
+            w = 'Iteracje' if self.current_algorithm == 'annealing' else 'Generacje'
+            plt.xlabel(w)
+            plt.ylabel('Wartość funkcji celu')
             plt.title('Przebieg rozwiązań')
             plt.show()
         elif self.current_algorithm == 'greedy':
