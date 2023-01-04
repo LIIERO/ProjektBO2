@@ -4,7 +4,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QApplication, QStackedWidget
+from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QLineEdit, QPushButton, QMessageBox, QApplication, QStackedWidget
 
 import genetic_algorithm
 from farm_simulation import PLANTS, FarmSimulation
@@ -126,7 +126,7 @@ class Init2Window(Window):
         # self.setGeometry(50, 50, 300, 100)
 
     def random_data(self):
-        Pr = [round(random.uniform(1, 6), 3) for _ in range(N)]
+        Pr = [round(random.uniform(0.1, 5), 3) for _ in range(N)]
         Dr = [round(random.uniform(0.1, 10), 3) for _ in range(N)]
         br = random.sample(range(1, MQ-1), N)
         for n in range(N):
@@ -174,55 +174,47 @@ class FarmGUI(Window):
 
         # przypisanie widgetów do układu tabelarycznego
         LayoutT = QGridLayout()
-        LayoutT.addWidget(label1, 0, 0)
-        LayoutT.addWidget(label2, 0, 1)
-        LayoutT.addWidget(label3, 0, 2)
+
+        LayoutL = QGridLayout()
+        LayoutL.addWidget(label1, 0, 0)
+        LayoutL.addWidget(label2, 0, 1)
+        LayoutL.addWidget(label3, 0, 2)
 
         self.resultEdt.readonly = True
         self.resultEdt.setToolTip('Wpisz wszystkie parametry i wybierz interesujący algorytm...')
-        self.resultEdt.resize(self.resultEdt.sizeHint())
-        LayoutT.addWidget(self.resultEdt, 1, 2)
+        # self.resultEdt.resize(self.resultEdt.sizeHint())
 
         # przyciski
         greedyBtn = QPushButton("&greedy", self)
-        annealingBtn = QPushButton("&annealing", self)
+        annealingBtn = QPushButton("&annealing v1", self)
+        annealingv2Btn = QPushButton("&annealing v2", self)
         genetic_rouleBtn = QPushButton("&genetic roule", self)
         genetic_rankBtn = QPushButton("&genetic rank", self)
-        endBtn = QPushButton("&end", self)
-        endBtn.resize(endBtn.sizeHint())
 
-        LayoutH = QHBoxLayout()
-        LayoutH.addWidget(greedyBtn)
-        LayoutH.addWidget(annealingBtn)
-        LayoutH.addWidget(genetic_rouleBtn)
-        LayoutH.addWidget(genetic_rankBtn)
+        LayoutL.addWidget(annealingBtn, 1, 0)
+        LayoutL.addWidget(genetic_rouleBtn, 1, 1)
+        LayoutL.addWidget(self.resultEdt, 1, 2)
 
-        LayoutT.addLayout(LayoutH, 2, 0, 1, 3)
+        LayoutL.addWidget(annealingv2Btn, 2, 0)
+        LayoutL.addWidget(genetic_rankBtn, 2, 1)
+        LayoutL.addWidget(greedyBtn, 2, 2)
+
+        LayoutT.addLayout(LayoutL, 0, 0, 1, 3)
 
         LayoutT.addWidget(QLabel("Temperatura maksymalna: ", self), 3, 0)
         LayoutT.addWidget(self.anIterEdt, 3, 1)
         self.anIterEdt.setText(str(1000))
 
-        LayoutT.addWidget(endBtn, 5, 0, 1, 3)
-
-        # rozwinitBtn = QPushButton("&rozw. początkowe", self)
-        # rozwbestBtn = QPushButton("&rozw. najlepsze", self)
         showgraphBtn = QPushButton("&wyświetl przebieg rozwiązań", self)
-
-        # LayoutT.addWidget(rozwinitBtn, 1, 0)
-        # LayoutT.addWidget(rozwbestBtn, 1, 1)
         LayoutT.addWidget(showgraphBtn, 4, 0, 1, 3)
-
-        # rozwinitBtn.clicked.connect(self.show_begin_solution)
-        # rozwbestBtn.clicked.connect(self.show_best_solution)
         showgraphBtn.clicked.connect(self.display_solution_graph)
 
         # przypisanie utworzonego układu do okna
         self.setLayout(LayoutT)
 
-        endBtn.clicked.connect(self.end)
         greedyBtn.clicked.connect(self.greedy)
-        annealingBtn.clicked.connect(self.annealing)
+        annealingBtn.clicked.connect(self.annealingv1)
+        annealingv2Btn.clicked.connect(self.annealingv2)
         genetic_rouleBtn.clicked.connect(self.genetic)
         genetic_rankBtn.clicked.connect(self.genetic)
 
@@ -250,13 +242,17 @@ class FarmGUI(Window):
         else:
             QMessageBox.warning(self, "Błąd", "Najpierw użyj wybranego algorytmu", QMessageBox.Ok)
 
-    def annealing(self):
+    def annealing(self, stages=None):
         try:
             it = int(self.anIterEdt.text())
             if it < 1 or it > MAX_AN_ITER: raise ValueError
 
             greedy_s = self.sim.solve_greedy()
-            wynik, solutions = self.sim.simulated_annealing(greedy_s, it)
+
+            if stages is None:
+                wynik, solutions = self.sim.simulated_annealing(greedy_s, it)
+            else:
+                wynik, solutions = self.sim.simulated_annealing_v2(greedy_s, it, stages)
             self.solutions = solutions
 
             cur_best = solutions[0]
@@ -273,6 +269,13 @@ class FarmGUI(Window):
             self.show_best_solution()
         except ValueError:
             QMessageBox.warning(self, "Błąd", "Błędne dane", QMessageBox.Ok)
+
+    def annealingv1(self):
+        self.annealing()
+
+    def annealingv2(self):
+        stages = 4 # ustalone 4 etapy
+        self.annealing(stages)
 
     def genetic(self):
 

@@ -325,7 +325,7 @@ class FarmSimulation(object):
         solutions = [self.simulate_farm(s0)] + [-1] * (
                     k_max - 1)  # Lista będąca zapisem przebiegu wartości rozwiązań do wyświetlenia na wykresie
         i = 1
-        for k in range(k_max):
+        for k in range(k_max-1):
             if k_max >= 0.99**k:
                 year = random.randrange(self.yearsNumber)
                 field = random.randrange(self.fieldNumber)
@@ -373,9 +373,13 @@ class FarmSimulation(object):
 
         rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant or plant == "EMPTY"])
 
-        if year > 0:
+
+        if year > 0 and rand_plant != 'EMPTY':
             while (self.Q[year - 1][field] - self.plantInfluenceDict[rand_plant]) < 0:
+
                 rand_plant = random.choice([plant for plant in PLANTS if plant != curr_plant or plant == "EMPTY"])
+                if rand_plant == "EMPTY":
+                    break
 
         s_out = deepcopy(s_inp)
         s_out[year][field] = rand_plant
