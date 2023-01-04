@@ -3,20 +3,11 @@ import sys, os
 import random
 import matplotlib.pyplot as plt
 import numpy as np
-import pygame
-from pygame import mixer
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QApplication, QStackedWidget
 
 import genetic_algorithm
 from farm_simulation import PLANTS, FarmSimulation
-
-pygame.init()
-mixer.pre_init(44100, -16, 2, 512)
-s1 = mixer.Sound('./sounds/polepolelysepole.ogg')
-s2 = mixer.Sound('./sounds/alemamjuzplan.ogg')
-s3 = mixer.Sound('./sounds/pomalutkubezpospiechuwszystkozrobiesam.ogg')
-s4 = mixer.Sound('./sounds/nadmakietasiemechylemladnychparelat.ogg')
 
 class Window(QWidget):
     def __init__(self, parent=None):
@@ -81,7 +72,6 @@ class InitWindow(Window): # Nie dokończone
     def skip():
         global N, Y, P, D, b
         N, Y, P, D, b = default_N, default_Y, default_P, default_D, default_b
-        s1.play()
         okno.interface()
         widget.setCurrentWidget(okno)
 
@@ -153,7 +143,6 @@ class Init2Window(Window):
             if min(P) <= 0 or min(D) <= 0 or min(b) <= 0 or max(b) >= 100:
                 raise ValueError
 
-            s1.play()
             okno.interface()
             widget.setCurrentWidget(okno)
         except ValueError:
@@ -241,14 +230,12 @@ class FarmGUI(Window):
 
     def show_best_solution(self):
         if self.current_algorithm:
-            s2.play() if N < 8 else s3.play()
             os.system('cls')
             print(f"Rozwiązanie wyznaczone algorytmem {self.current_algorithm}.\n")
             self.sim.display_solution()
 
     def display_solution_graph(self):
         if self.current_algorithm in ['annealing', 'genetic']:
-            s4.play()
             plt.plot(self.solutions)
             plt.plot(self.best_solutions)
             plt.legend(['kolejne rozwiązania', 'najlepsze rozwiązania'])
