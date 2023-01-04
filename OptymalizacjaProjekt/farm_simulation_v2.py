@@ -205,7 +205,7 @@ class FarmSimulation(object):
 
         return self.decisionMatrix
 
-    def simulated_annealing_v2(self, s0: list[list], k_max, stages): # Symulowane wyżarzanie
+    def simulated_annealing(self, s0: list[list], k_max, stages): # Symulowane wyżarzanie
         """Nasza implementaacja algorytmu symulowanego wyżarzania
 
                 :param s0:
@@ -223,11 +223,11 @@ class FarmSimulation(object):
             if k_max >= 0.99**k:
                 year = random.randrange(self.yearsNumber)
                 field = random.randrange(self.fieldNumber)
-                T = self.__annealing_temp_v2(k, k_max)
+                T = self.__annealing_temp(k, k_max)
                 solutions[i] = self.simulate_farm(s)
                 # kilka podejść na temperaturę ( epokę )
                 for _ in range(stages):
-                    s_new = self.__annealing_neig_v2(s, k_max, T, year, field)
+                    s_new = self.__annealing_neig(s, k_max, T, year, field)
 
                     if self.simulate_farm(s_new[0]) > self.simulate_farm(best_s):
                         best_s = deepcopy(s_new[0])
@@ -243,18 +243,18 @@ class FarmSimulation(object):
         return best_s, solutions
 
     @staticmethod
-    def __annealing_temp_v2(inp, k_m): # Funkcja obliczająca temperaturę
+    def __annealing_temp(inp, k_m): # Funkcja obliczająca temperaturę
         return k_m * 0.99**inp # Najprostszy sposób
 
-    def __annealing_neig_v2(self, s_inp, k_m, T, last_year, last_field): # Funkcja wyznaczająca sąsiednie rozwiązanie
+    def __annealing_neig(self, s_inp, k_m, T, last_year, last_field): # Funkcja wyznaczająca sąsiednie rozwiązanie
         """  """
 
         # jeśli to nie jest pierwsze podejście to losujemy z mniejszego zakresu
         # większ losowość przy wyższej temperaturze
-        range_year = self.__range_builder_v2(last_year - T * self.yearsNumber/(2*k_m), last_year+T * self.yearsNumber/(2*k_m),
+        range_year = self.__range_builder(last_year - T * self.yearsNumber/(2*k_m), last_year+T * self.yearsNumber/(2*k_m),
                                           self.yearsNumber)
 
-        range_field = self.__range_builder_v2(last_field - T * self.fieldNumber/(2*k_m), last_field+T*self.fieldNumber/(2*k_m),
+        range_field = self.__range_builder(last_field - T * self.fieldNumber/(2*k_m), last_field+T*self.fieldNumber/(2*k_m),
                                            self.fieldNumber)
 
         year = random.randrange(range_year[0], range_year[1])
@@ -279,16 +279,16 @@ class FarmSimulation(object):
 
         except IndexError:
             # print('Nie spełnia ograniczenia jakości')
-            return self.__annealing_neig_v2(s_inp, k_m, T, last_year, last_field) # Ponowna próba
+            return self.__annealing_neig(s_inp, k_m, T, last_year, last_field) # Ponowna próba
 
         except ValueError:
             # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
-            return self.__annealing_neig_v2(s_inp, k_m, T, last_year, last_field) # Ponowna próba
+            return self.__annealing_neig(s_inp, k_m, T, last_year, last_field) # Ponowna próba
 
         return s_out, year, field
 
     @staticmethod
-    def __range_builder_v2(lower, higher, max_number):
+    def __range_builder(lower, higher, max_number):
         """  """
         lower = int(lower)
         higher = int(higher)
