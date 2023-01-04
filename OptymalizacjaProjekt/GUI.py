@@ -286,23 +286,22 @@ class FarmGUI(Window):
             generation_quantities = int(Y*25)
             # print(generation_quantities) # TODO: Zrób coś z tym
             if sender.text() == "&genetic roule":
-                if Y + N < 3:
+                if Y < 2 and min(b) > 9:
                     amount_chromoses = 8
-                elif abs(Y-N) < 4:
-                    amount_chromoses = Y+N+4
-                elif min([Y, N]) > 4:
-                    amount_chromoses = min([Y, N])*2+4
+                elif Y > 2 and min(b) > 9:
+                    amount_chromoses = 3*Y + 2
                 else:
-                    amount_chromoses = 8
+                    amount_chromoses = 5
                 wynik, solutions = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "roulette", generation_quantities)
             elif sender.text() == "&genetic rank":
-                if Y + N < 3:
+                if Y < 2 and min(b) > 9:
                     amount_chromoses = 8
-                elif abs(Y - N) < 4:
-                    amount_chromoses = Y + N + 4
+                elif Y > 2 and min(b) > 9:
+                    amount_chromoses = 3 * Y + 2
                 else:
-                    amount_chromoses = 8
+                    amount_chromoses = 5
                 wynik, solutions = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "rank", generation_quantities)
+            print(amount_chromoses)
             self.resultEdt.setText(str(round(wynik, 3)))
             solutions = [el for el in solutions if el is not None]
             self.solutions = solutions

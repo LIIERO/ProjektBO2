@@ -267,11 +267,21 @@ zmianom podejścia do sąsiedztwa (jedynie w kontekście jednej epoki).
 Jedyną różnicą wobec pierwotnej wersją jest losowanie indeksu roku i pola przed pierwszą próbą w danej epoce by móc ją przekazać do funkcji annealing neighbour oraz wprowadzenie dodatkowej pętli aby wykonać zadaną liczbę prób dla danej epoki.
 
 \subsection{algorytm genetyczny}
-Algorytmy Genetyczne opierają się na teorii Darwina dotyczącej doboru naturalnego w przyrodzie, teoria ta zakłada że najwyższe szanse na przeżycie i przekazanie swoich cech potomstwu mają najlepiej przystosowane osobniki, czy raczej najbardziej przystosowujące się do zmian. Algorytmy te również czerpią inspirację z gałęzi biologii zajmującej się genetyką tzn. mechanizmem odpowiedzialnym za dziedziczenie cech biologicznych np. kolor włosów, wzrost itp.\\
+Algorytmy Genetyczne opierają się na teorii Darwina dotyczącej doboru naturalnego w przyrodzie, teoria ta zakłada że najwyższe szanse na przeżycie i przekazanie swoich cech potomstwu mają najlepiej przystosowane osobniki, czy raczej najbardziej przystosowujące się do zmian. Algorytmy te również czerpią inspirację z gałęzi biologii zajmującej się genetyką tzn. mechanizmem odpowiedzialnym za dziedziczenie cech biologicznych np. kolor włosów, wzrost itp.
+Ograniczeniem algorytmów genetycznych jest losowość, która jest ich istotną. Poniżej przedstawiamy pseudokod obrazujące główne etapy algorytmu.
 
-Ograniczeniem algorytmów genetycznych jest losowość, która jest ich istotną
+\begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{genetic_pseudocode.png}
+        \label{fig:paneloperatorski}
+\end{figure}
+\newpage
+W przypadku tego algorytmu również postanowiliśmy że zrealizujemy dwie wersje tego algorytmu, jednak różniące się jedynie metodą selekcji i krzyżowania.
+W porównaniu do poprzednich algorytmów dla algorytmów genetycznych musieliśmy zrezygnować z  naszej orginalnej metody symulacji całego gospodarstwa, gdyż doprowadziło by to do niepotrzebnego zwiększenia złożoności obliczeniowej algorytmów. Aby temu zapobiec dla tych podejść postanowiliśmy symulować niezależnie od siebie każde pole z osobna (więc rozwiązaniem algorytmu genetycznego jest wektor roślin dobranych w kolejnych latach do danego pola), w ten sposób w rzeczywistości pojedynczy algorytm genetyczny wykonuje się tyle ile jest pól, jednak dzięki temu podejściu znacznie ułatwiła się końcowa implementacja algorytmu jak i czas trwania algorytmu. Uznaliśmy również za najrozsądniejszą decyzję by nie udostępniać użytkownikowi zmiany liczbę chromosomów oraz pokoleń które automatycznie dynamicznie dostosowują  się do liczby symulowanych lat, zrobiliśmy tak z powodu dość ograniczonej liczby dostępnych roślin i dla pewnych słabszych
+ Dlatego poniżej przedstawimy od razu nasze oba podejścia:
 
-
+\subsubsection{Inicjalizacja}
+Odpowiada u nas za to funkcja: $initial_result$
 
 \subsection{wyniki}
 
