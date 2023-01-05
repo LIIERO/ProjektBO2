@@ -289,17 +289,17 @@ class FarmGUI(Window):
                 if Y < 2 and min(b) > 9:
                     amount_chromoses = 8
                 elif Y > 2 and min(b) > 9:
-                    amount_chromoses = 3*Y + 2
+                    amount_chromoses = 2*Y + 4
                 else:
-                    amount_chromoses = 5
+                    amount_chromoses = 6
                 wynik, solutions = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "roulette", generation_quantities)
             elif sender.text() == "&genetic rank":
                 if Y < 2 and min(b) > 9:
                     amount_chromoses = 8
                 elif Y > 2 and min(b) > 9:
-                    amount_chromoses = 3 * Y + 2
+                    amount_chromoses = 2 * Y + 4
                 else:
-                    amount_chromoses = 5
+                    amount_chromoses = 6
                 wynik, solutions = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "rank", generation_quantities)
             print(amount_chromoses)
             self.resultEdt.setText(str(round(wynik, 3)))

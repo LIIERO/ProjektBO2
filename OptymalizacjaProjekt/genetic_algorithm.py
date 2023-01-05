@@ -146,7 +146,7 @@ class Genetic(object):
 
         return parent
 
-    def crossover(self, selection, selection_type):
+    def crossover(self, selection, selection_type, number_chromosome):
         """procedura krzyżowania
 
         :param selection:
@@ -154,17 +154,18 @@ class Genetic(object):
         :return:
         """
         sel = deepcopy(selection)
-        flag = False
+
         children = []
 
         if selection_type == "rank":  # krzyżowanie dla przypadku selekcji rankingowej
             sel_out = deepcopy(sel)
 
             for _ in range(
-                    len(self.chromosome) // 2):  # wygenerowanie tylu potomków iel liczyła dotychczasowan ilość chromosomów w generacji
+                    int(number_chromosome/2)):  # wygenerowanie tylu potomków iel liczyła dotychczasowan ilość chromosomów w generacji
+                flag = False
                 while not flag:
                     flag = True
-                    k = np.random.randint(0, len(sel_out[0]), 2)  # losowanie przdziału krzyżowania
+                    k = np.random.randint(0, len(sel_out[0]), 2)  # losowanie przedziału krzyżowania
                     k = sorted(k)  # posortowane otrzymanych indeksów
 
                     for i in range(k[0], k[1]):
@@ -182,18 +183,21 @@ class Genetic(object):
                     except ValueError:
                         # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
                         flag = False  # Ponowna próba
+                    # for k in children:
+                    #     if k == sel_out:
+                    #         flag = False
 
                     if flag:
-                        children.append(deepcopy(sel_out))
+                        children.append(deepcopy(sel_out[0]))
+                        children.append(deepcopy(sel_out[1]))
 
         elif selection_type == "roulette":  # krzyżowane dla selekcji z metodą ruletki
             sel_out = deepcopy(sel)
-
-            for m in range(
-                    len(sel_out) // 2):  # krzyżowanie kolejnych rodziców, tak by ich liczba była identyczna do istniejących już chromosomó
+            for m in range(int(number_chromosome/2)):  # krzyżowanie kolejnych rodziców, tak by ich liczba była identyczna do istniejących już chromosomó
+                flag = False
                 while not flag:  # reszta kometarzy identyczna jak dla metody rankingowej
                     flag = True
-                    children = []
+
                     k = np.random.randint(0, len(sel_out[0][:-1]), 2)
                     k = sorted(k)
 
@@ -213,8 +217,8 @@ class Genetic(object):
                         flag = False  # Ponowna próba
 
                     if flag:
-                        children.append(deepcopy(sel_out))
-
+                        children.append(deepcopy(sel_out[2 * m]))
+                        children.append(deepcopy(sel_out[2 * m+1]))
         return children
 
     def mutation(self, crossover):  # procedura mutacji
@@ -224,55 +228,77 @@ class Genetic(object):
         :return:
         """
         mutation = deepcopy(crossover)
-        mutation_out = list(mutation[0])
+        mutation_out = [i + [random.random()] for i in mutation] #prawdopodobieństwo mutacji
         j = 0
-        for i in deepcopy(mutation_out):  # komentarze identyczne jak dla metody inicjallizującej
-            flag = False
-            i_inp = deepcopy(i)
-            attempts = 0
-            mutations_for_one_parents = []
+        for i in deepcopy(mutation_out):
+            i_inp = deepcopy(i[:-1])
+            income = self.__simulate_one_field(i_inp)
+            if i[-1] >= 0.5:
+                changes = math.ceil((i[-1] - 0.5)*len(mutation_out)) #wyliczenie liczby zmian w mutacji
+                attempts = 0 #liczba prób uzyskania dodatniego zysku
 
-            for m in range(10):
-                while not flag:
-                    i = deepcopy(i_inp)
-                    flag = True
-                    year = random.randrange(len(i))
-                    curr_plant = i[year]
-                    rand_plant = random.choice([plant for plant in self.plants if plant != curr_plant])
-                    i[year] = rand_plant
+                mutations_for_one_chromosome = deepcopy(i_inp)  #lista w której będziemy dokonać zmiany
+                years = [] #lista zawierająca już podmienione lata
+                attempts_error = 0 #licznik powstrzymujący przed wejście w nieskończoną pętle
 
-                    for l in mutations_for_one_parents:  # sprawdzenie czy dany chromosom nie jest już w generacji
-                        if l[year] == i[year]:
-                            flag = False
+                for _ in range(changes):
+                    flag = False
 
-                    try:
-                        self.__simulate_one_field(i)
+                    while not flag:
 
-                    except IndexError:
-                        # print('Nie spełnia ograniczenia jakości')
-                        flag = False  # Ponowna próba
+                        flag = True
+                        year = random.randrange(len(mutations_for_one_chromosome)) #dobieramy rok zmiany
+                        for l in years:
+                            if l == year:
+                                flag = False
 
-                    except ValueError:
-                        # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
-                        flag = False  # Ponowna próba
+                        curr_plant = mutations_for_one_chromosome[year]
+                        rand_plant = random.choice([plant for plant in self.plants if plant != curr_plant])
+                        mutations_for_one_chromosome[year] = rand_plant #podmieniamy dotychczasowy gen na wylosowany
 
-                    if flag:
-                        mut = deepcopy(i)
-                        income = self.__simulate_one_field(i)
+                        try:
+                            self.__simulate_one_field(mutations_for_one_chromosome)
 
-                        if income > 0 or attempts > 10:
-                            mut.append(income)
-                            mutations_for_one_parents.append(mut)
+                        except IndexError:
+                            # print('Nie spełnia ograniczenia jakości')
+                            attempts_error += 1
+                            if attempts_error <= 1000:
+                                flag = False  # Ponowna próba
+                            else:
+                                mutations_for_one_chromosome[year] = curr_plant  # przywracamy starą wartość
+                                flag = True
 
+                        except ValueError:
+                            # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
+
+                            attempts_error += 1
+                            if attempts_error <= 1000:
+                                flag = False  # Ponowna próba
+                            else:
+                                mutations_for_one_chromosome[year] = curr_plant  # przywracamy starą wartość
+                                flag = True
+
+                        if flag:
+                            income = self.__simulate_one_field(mutations_for_one_chromosome)
+
+                            if income < 0 and attempts < 10: #sprawdzamy czy zysk nie jest ujemny i czy nie próbujemy już zbyt długo uzyskać dodatniego zysku
+                                mutations_for_one_chromosome[year] = curr_plant # przywracamy starą wartość
+                                attempts += 1 #zwiększamy licznik podejść
+                                flag = False
+                            else:
+                                years.append(year) #dodajemy rok do już podmienionych
                         else:
-                            attempts += 1
-                            flag = False
+                            mutations_for_one_chromosome[year] = curr_plant #jeśli flaga jest negatywna przywracamy dotychczasową wartość
 
-            mutations_for_one_parents.sort(key=lambda x: x[-1])  # sortowanie mutacji
-            mutation_out[j] = deepcopy(mutations_for_one_parents[-1])  # wybranie najlepszej mutacji
+
+                income = self.__simulate_one_field(mutations_for_one_chromosome)
+                i_inp = deepcopy(mutations_for_one_chromosome)
+
+            i_inp.append(income)
+            mutation[j] = deepcopy(i_inp)
             j += 1
 
-        return mutation_out
+        return mutation
 
     def __simulate_one_field(self, decisons: list[str]):  # symulacja wartości zysków dla jednego pola
         for i in range(self.farm.yearsNumber - 1):
@@ -332,14 +358,18 @@ def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chrom
 
             if selection_type == "roulette":
                 selection = genetic.selection_roulette(generation_number)
-                children = genetic.crossover(selection, selection_type)
+                children = genetic.crossover(selection, selection_type, number_chromosome)
 
             elif selection_type == "rank":
                 selection = genetic.selection_rank(generation_number)
-                children = genetic.crossover(selection, selection_type)
+                children = genetic.crossover(selection, selection_type, number_chromosome)
+
+
 
             mutation = genetic.mutation(children)
             genetic.chromosome = deepcopy(mutation)
+
+
             income_in_each_generation[generation_number][field_number] = max([io[-1] for io in genetic.chromosome])
 
         max_earnings = max([io[-1] for io in genetic.chromosome])  # maksymalna ocena chromosomu dla ostatniej generacji
@@ -372,5 +402,6 @@ def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chrom
     farm.simulate_farm(genetic_result)
     #zwracam najlepsze rozwiązanie
     farm.simulate_farm(beast_genetic_result)
-    # print(beast_generation_number)
+    print("Numery poszczególnych generacji dla kolejnych pól dla których otrzymaliśmy najlepsze wyniki:")
+    print(beast_generation_number)
     return farm.earnings, [sum(income_in_each_generation[t][:]) for t in range(generation_quantity)]

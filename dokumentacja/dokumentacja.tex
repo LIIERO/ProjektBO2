@@ -25,6 +25,10 @@
 \usepackage{listings}
 \usepackage{color}
 
+
+\begin{center}
+    \includegraphics[width=75mm]{field.jpg}
+\end{center}
 \newcommand{\AASprTab}[5]{
 
 
@@ -91,10 +95,10 @@
 
 \begin{document}
 
-\AASprTab { Asynchroniczny silnik klatkowy z falownikiem }{16 grudnia 2022 r.}{Bartłomiej Matuszewski}{Piotr Mamos}{Dawid Maziarski}
+\AASprTab { tabela1 }{1 stycznia 2022 r.}{Bartłomiej Matuszewski}{Piotr Mamos}{Dawid Maziarski}
 
 \tableofcontents
-
+\newpage
 \section{Wstęp}
 Celem projektu była optymalizacja jednego z wymyślonych przez nasz problemów za pomocą poznanych na zajęciach algorytmów oraz innych źródeł (doradzanych przez prowadzącego).
 Poniżej przedstawiamy rozwazane przez nas pomysły:
@@ -276,13 +280,30 @@ Ograniczeniem algorytmów genetycznych jest losowość, która jest ich istotną
         \label{fig:paneloperatorski}
 \end{figure}
 \newpage
-W przypadku tego algorytmu również postanowiliśmy że zrealizujemy dwie wersje tego algorytmu, jednak różniące się jedynie metodą selekcji i krzyżowania.
-W porównaniu do poprzednich algorytmów dla algorytmów genetycznych musieliśmy zrezygnować z  naszej orginalnej metody symulacji całego gospodarstwa, gdyż doprowadziło by to do niepotrzebnego zwiększenia złożoności obliczeniowej algorytmów. Aby temu zapobiec dla tych podejść postanowiliśmy symulować niezależnie od siebie każde pole z osobna (więc rozwiązaniem algorytmu genetycznego jest wektor roślin dobranych w kolejnych latach do danego pola), w ten sposób w rzeczywistości pojedynczy algorytm genetyczny wykonuje się tyle ile jest pól, jednak dzięki temu podejściu znacznie ułatwiła się końcowa implementacja algorytmu jak i czas trwania algorytmu. Uznaliśmy również za najrozsądniejszą decyzję by nie udostępniać użytkownikowi zmiany liczbę chromosomów oraz pokoleń które automatycznie dynamicznie dostosowują  się do liczby symulowanych lat, zrobiliśmy tak z powodu dość ograniczonej liczby dostępnych roślin i dla pewnych słabszych
- Dlatego poniżej przedstawimy od razu nasze oba podejścia:
+\subsubsection{Uwagi ogólne}
+W przypadku tego algorytmu również postanowiliśmy że zrealizujemy dwie wersje tego algorytmu, jednak różniące się jedynie metodą selekcji i krzyżowania. Jako algorytm konstrukcyjny skorzystaliśmy z algorytmu zachłannego. Ustaliśmy również że w każdej generacji wymieniamy wszystkie osobniki, nie uwzględniamy więc przypadku gdy część starszej generacji  pozostaje dostępna w kolejnej (przy czym pozwalamy na przypadek że w wyniku selekcji, krzyżowania i mutacji powstanie identyczny osobnik jak w którejś z poprzednik generacji).
+W porównaniu do poprzednich algorytmów dla algorytmów genetycznych musieliśmy zrezygnować z  naszej orginalnej metody symulacji całego gospodarstwa, gdyż doprowadziło by to do niepotrzebnego zwiększenia złożoności obliczeniowej algorytmów. Aby temu zapobiec dla tych podejść postanowiliśmy symulować niezależnie od siebie każde pole z osobna (więc rozwiązaniem algorytmu genetycznego jest wektor roślin dobranych w kolejnych latach do danego pola), w ten sposób w rzeczywistości pojedynczy algorytm genetyczny wykonuje się tyle ile jest pól, jednak dzięki temu podejściu znacznie ułatwiła się końcowa implementacja algorytmu jak i czas trwania algorytmu. Z tego też powodu ostateczny wynik działania algorytmu to suma najlepszych generacji każdego pola.  Uznaliśmy również za rozsądną decyzję by nie udostępniać użytkownikowi zmiany liczbę chromosomów oraz pokoleń które automatycznie dynamicznie dostosowują  się do liczby symulowanych lat i początkowej jakości gleby, zrobiliśmy tak z powodu dość ograniczonej liczby dostępnych roślin i dla pewnych słabszych gleb mogło stać się nie możliwe wylosowanie takiej ilości niepowtarzalnych chromosomów. z uwagi na duże podobieństwo implemetacyhne obu metod poniżej przedstawiamy opis od razu obu podejść:
 
 \subsubsection{Inicjalizacja}
-Odpowiada u nas za to funkcja: $initial_result$
+Inicjalizacja wykonuje się tylko raz dla każdego pola w zerowej generacji.
+Realizuje ją metoda $initial_result$. Przyjmuje ona początkową generacje, która składa się z zadanej liczby identycznych chromosomów przyjętych z rozwiązania algorytmu zachłannego. Następnie w sposób w każdym z nich podmienia losowy gen, w taki sposób by ostatecznie otrzymać generacje niepowtarzalnych, poprawnych (oraz w razie możliwości dających nie zerowy zysk) osobników.
 
+\subsubsection{Selekcja metoda ruletki}
+Po inicjalizacji przechodzimy do etapu selekcji która będzie wykonywała się dla każdej generacji. Realizowana jest ona przez metodę $selection_roulette$. Jako że ta metoda znajduję się na początku każdej generacji uzywamy jej również do sprawdzenia czy nie poprawiła się maksymalna wartość zysku otrzymana w dotychczasowych generacjach. Samą selekcje rozpoczynamy od znalezienia minimalnej wartości zysku w generacji i w przypadku gdy jest ona ujemna  podczas ustalania prawdodopodobieństwa wybrania danego osobnika dodajemy do każdego z nich tą wartość. Robimy tak ponieważ w przypadku ujemnych wartości program dobierał błędne wartości prawdopodobieństw (a w najgorszych przypadkach dochodziło do tego że nie potrafił on dobrać żadnej wartości prawddobieństw). Po owym warunku sumujemy zyski wszystkich chromosomów w generacji, a następnie ustalamy prawdopodobieństwo przyjęcia każdego z osobników, w wyniku dzielenia zysku danego chromosomu przez wyliczoną sumę). Ostatecznie w pętli wybieramy zgodnie z zasadą działania koła ruletki dwójkę rodziców, tak by ostatecznie otrzymać liczbę par równą połowie liczby chromosomów.
+
+\subsubsection{Selekcja metoda rankingowa}
+Tak jak dla metody ruletki wykonuje się ona dla każdej generacji oraz sprawdza poprawne najlepszej generacji. Realizuje ją metoda $selection_rank$. Dla tego podejścia początkowo sortujemy osobniki w  generacji a następnie przekazujemy dwa najlepsze chromosomy dalej.
+Jest to więc dużo prostsza metoda od względem implementacyjnym dla tego etapu.
+
+\subsubsection{Krzyżowanie metoda ruletki}
+Realizowana jest krzyżowanie wielopunktowe przez metode $crossover$ . Dostaje ona rodziców z selekcji następnie dla każdej pary rodziców losujemy zakres genów które następnie są wymieniane między osobnikami rodzicielskimi i w ten sposób powstają osobniki potomne. Przed zwróceniem dzieci następuje jeszcze sprawdzenie czy powstałe osobniki są poprawne.
+
+\subsubsection{Krzyżowanie metoda rank}
+Implementacja tego krzyżowania znajduje się w tej samej metodzie co poprzednie krzyżowanie i róźni się jedynie tym że potomstwo tworzone jest jedynie z krzyżowania jednej pary rodziców. Sprowadza się wiec to do wielokrotnego losowania zakresu podmienianych genów dla tej samej pary osobników rodzicielskich.
+
+
+\subsection{Mutacja}
+Zaimplemtowana jest w metodzie $mutation$. Otrzymuje ona jako parametr dzieci  które dostaliśmy w wyniku krzyżowania. Do każdego dziecka dodawana jest losowa wartość z zakresu od 0 do 1, a następnie osobniki które otrzymały wartość ponad 0.5 (wartość ta jest zdecydowanie większa niż w większości innych przykładów zastosowania algorytmu genetycznego, jednak z uwagi na dość ograniczoną liczbę możliwości , większość dzieci otrzymana z krzyżowania cechuje się między sobą bardzo małą różnorodnością i zbyt mała prawdopodobność mutacji mogła doprowadzić że algorytm utknął by w minumum lokalnym)  zostaną zmutowane, a pozostałe nie. Wylosowana wartość decyduje również o ilości zmienionych genów. Jako sposobu mutacji skorzystaliśmy z losowej mutacji resetującej dotychczasowe wartośći, więc identycznie jak w inicjalizacji wybieramy rok i zmieniamy związany z nim gen na losowo dobrany inny. Sprawdzamy również czy wylosowany gen nie był już raz zmieniany, jeśli tak to losujemy jeszcze raz. Z uwagi na wpadanie w nieskończoną pętle związaną z narzuconymi ograniczeniami, zastosowaliśmy również licznik ilości takich przekroczeń i jeśli przekroczy on pewną wartość to przywracamy ostatnią poprawną wersję chromosomu i rezygnujemy z dalszej jego modyfikacji.
 \subsection{wyniki}
 
 
@@ -292,7 +313,9 @@ Indeksacja
 wybór następnego kandydata na rozwiązanie
 
 źle zaimplementowane dobieranie temperatury (chyba)
-
-	
+\section{Pomysły}
+-ograniczyć błąd związany z jakością pola (że jesli w momencie uprawy roślina nie będzie pogorszyć jakości ziemi poniżej zera to można ją puścić)
+- możliwość przekazywania części osobników z jednego pokolenia do kolejnego
+- możliwość uniknięcia mutacji
 
 \end{document}
