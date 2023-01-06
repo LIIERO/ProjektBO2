@@ -233,66 +233,75 @@ class Genetic(object):
         for i in deepcopy(mutation_out):
             i_inp = deepcopy(i[:-1])
             income = self.__simulate_one_field(i_inp)
-            if i[-1] >= 0.5:
-                changes = math.ceil((i[-1] - 0.5)*len(mutation_out)) #wyliczenie liczby zmian w mutacji
-                attempts = 0 #liczba prób uzyskania dodatniego zysku
+            if i[-1] >= 0.6:
 
-                mutations_for_one_chromosome = deepcopy(i_inp)  #lista w której będziemy dokonać zmiany
-                years = [] #lista zawierająca już podmienione lata
-                attempts_error = 0 #licznik powstrzymujący przed wejście w nieskończoną pętle
+                changes = math.ceil((i[-1] - 0.6)*len(i_inp)) #wyliczenie liczby zmian w mutacji
+                best_mutations_for_one_chromosome = [] # lista w której będziemy dokonać zmiany
+                max_income = -math.inf
+                for _ in range(4): # podjęcie kilku prób mutacji
+                    attempts = 0 #liczba prób uzyskania dodatniego zysku
 
-                for _ in range(changes):
-                    flag = False
+                    mutations_for_one_chromosome = deepcopy(i_inp)  #lista w której będziemy dokonać zmiany
+                    years = [] #lista zawierająca już podmienione lata
+                    attempts_error = 0 #licznik powstrzymujący przed wejście w nieskończoną pętle
 
-                    while not flag:
+                    for _ in range(changes):
+                        flag = False
 
-                        flag = True
-                        year = random.randrange(len(mutations_for_one_chromosome)) #dobieramy rok zmiany
-                        for l in years:
-                            if l == year:
-                                flag = False
+                        while not flag:
 
-                        curr_plant = mutations_for_one_chromosome[year]
-                        rand_plant = random.choice([plant for plant in self.plants if plant != curr_plant])
-                        mutations_for_one_chromosome[year] = rand_plant #podmieniamy dotychczasowy gen na wylosowany
+                            flag = True
+                            year = random.randrange(len(mutations_for_one_chromosome)) #dobieramy rok zmiany
+                            for l in years:
+                                if l == year:
+                                    flag = False
 
-                        try:
-                            self.__simulate_one_field(mutations_for_one_chromosome)
+                            curr_plant = mutations_for_one_chromosome[year]
+                            rand_plant = random.choice([plant for plant in self.plants if plant != curr_plant])
+                            mutations_for_one_chromosome[year] = rand_plant #podmieniamy dotychczasowy gen na wylosowany
 
-                        except IndexError:
-                            # print('Nie spełnia ograniczenia jakości')
-                            attempts_error += 1
-                            if attempts_error <= 1000:
-                                flag = False  # Ponowna próba
+                            try:
+                                self.__simulate_one_field(mutations_for_one_chromosome)
+
+                            except IndexError:
+                                # print('Nie spełnia ograniczenia jakości')
+                                attempts_error += 1
+                                if attempts_error <= 1000:
+                                    flag = False  # Ponowna próba
+                                else:
+                                    mutations_for_one_chromosome[year] = curr_plant  # przywracamy starą wartość
+                                    flag = True
+
+                            except ValueError:
+                                # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
+
+                                attempts_error += 1
+                                if attempts_error <= 1000:
+                                    flag = False  # Ponowna próba
+                                else:
+                                    mutations_for_one_chromosome[year] = curr_plant  # przywracamy starą wartość
+                                    flag = True
+
+                            if flag:
+                                income = self.__simulate_one_field(mutations_for_one_chromosome)
+
+                                if income < 0 and attempts < 10: #sprawdzamy czy zysk nie jest ujemny i czy nie próbujemy już zbyt długo uzyskać dodatniego zysku
+                                    mutations_for_one_chromosome[year] = curr_plant # przywracamy starą wartość
+                                    attempts += 1 #zwiększamy licznik podejść
+                                    flag = False
+                                else:
+                                    years.append(year) #dodajemy rok do już podmienionych
                             else:
-                                mutations_for_one_chromosome[year] = curr_plant  # przywracamy starą wartość
-                                flag = True
-
-                        except ValueError:
-                            # print('Nie spełnia ograniczenia innej rośliny w każdym roku')
-
-                            attempts_error += 1
-                            if attempts_error <= 1000:
-                                flag = False  # Ponowna próba
-                            else:
-                                mutations_for_one_chromosome[year] = curr_plant  # przywracamy starą wartość
-                                flag = True
-
-                        if flag:
-                            income = self.__simulate_one_field(mutations_for_one_chromosome)
-
-                            if income < 0 and attempts < 10: #sprawdzamy czy zysk nie jest ujemny i czy nie próbujemy już zbyt długo uzyskać dodatniego zysku
-                                mutations_for_one_chromosome[year] = curr_plant # przywracamy starą wartość
-                                attempts += 1 #zwiększamy licznik podejść
-                                flag = False
-                            else:
-                                years.append(year) #dodajemy rok do już podmienionych
-                        else:
-                            mutations_for_one_chromosome[year] = curr_plant #jeśli flaga jest negatywna przywracamy dotychczasową wartość
+                                mutations_for_one_chromosome[year] = curr_plant #jeśli flaga jest negatywna przywracamy dotychczasową wartość
 
 
-                income = self.__simulate_one_field(mutations_for_one_chromosome)
-                i_inp = deepcopy(mutations_for_one_chromosome)
+                    income = self.__simulate_one_field(mutations_for_one_chromosome)
+                    if income > max_income:
+                        max_income = income
+                        best_mutations_for_one_chromosome = deepcopy(mutations_for_one_chromosome)
+                i_inp = deepcopy(best_mutations_for_one_chromosome)
+
+                income = self.__simulate_one_field(best_mutations_for_one_chromosome)
 
             i_inp.append(income)
             mutation[j] = deepcopy(i_inp)
