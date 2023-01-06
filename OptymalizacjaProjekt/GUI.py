@@ -283,8 +283,8 @@ class FarmGUI(Window):
         wynik = ""
 
         try:
-            generation_quantities = int(Y*25)
-            # print(generation_quantities) # TODO: Zrób coś z tym
+            generation_quantities = int(Y*50) #Tu można zmienić liczbę generacji
+
             if sender.text() == "&genetic roule":
                 if Y < 2 and min(b) > 9:
                     amount_chromoses = 8
@@ -300,6 +300,7 @@ class FarmGUI(Window):
                     amount_chromoses = 2 * Y + 4
                 else:
                     amount_chromoses = 6
+                #amount_chromoses = 6 #Tu można zmienić liczbę chromosomów w generacji (należy też odkomentować, tą linijkę)
                 wynik, solutions = genetic_algorithm.genetic_algorithm(self.sim, PLANTS, amount_chromoses, "rank", generation_quantities)
             print(amount_chromoses)
             self.resultEdt.setText(str(round(wynik, 3)))
