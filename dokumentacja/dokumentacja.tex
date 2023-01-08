@@ -305,10 +305,10 @@ Z uwagi że na to że w rzeczywistości algorytm genetyczny wywoływany jest z o
 \section{Aplikacja}
 W ramach realizacji naszego projektu zrealizowaliśmy również proste GUI pozwalające w wygodny sposób użytkownikowi korzystać z naszego programu. Aby go uruchomić trzeba mieć pobraną i wypakowaną naszą aplikację, następnie uruchomić $FieldSimulation.exe$ . W ten sposób uruchomi się nam program w okienku oraz konsola. Konsola ta jest tylko do przedstawiania macierzy wynikowych oraz numerów najlepszych generacji z algorytmów genetycznych, jest to więc nie interaktywne narzędzie pomocnicze na które użytkownik nie musi zwracać uwagi jeśli interesują go tylko uzyskany zysk. W wspomnianym już okienku  ustalamy liczbę lat oraz pól które chcemy przesymulować, możemy również wybrać wcześniej przygotowany przypadek domyślny. Jeśli jednak chcemy zadeklarować własne parametry gospodarstwa to klikamy przycisk kontynuuj, wtedy ukazuje się nowe okienko w którym możemy wpisać powierzchnie każdego pola, dystans od gospodarstwa oraz początkową jakość ziemi. Możemy te pola wypełnić samemu lub wylosować, następnie musimy kliknąć ponownie przycisk kontynuuj. Wtedy ukaze nam się ostateczne okno w którym wybieramy jedną z metod symulacji, ustalamy temperature maksymalną dla metody wyżarzania . Możemy tam w górnym prawym rogu obserwować uzyskany zysk dla każdej z metod. Dla metod wyżarzania oraz algorytmów możemy wyświetlić również przebeg rozwiązania za pomocą przycisku w dolnej części okna, ukaże nam się wtedy dodatkowe okienko w którym będziemy mogli dokładnie przyjrzeć się przebiegowi. W  GUI nie udostępniliśmy możliwości zmiany ilości generacji czy liczby chromosomów (powody te opisaliśmy w akapicie dotyczącym algorytmu genetycznego), jeśli jednak użytkownik jest przekonany że chce zmienić te parametry może to zrobić wchodząc w przesłane pliki programu, a następnie otworzyć plik $GUI.py$ i w linijkach 286 oraz 303 powinny znajdować się zmienne ($generation_quantities$ oraz $amount_chromoses$) które decydują o tych parametrach.
 
-\subsection{testy}
+\section{testy}
 Każdy algorytm został puszczony 10-krotnie (w przypadku wyżarzania dla temperatur 250, 500, 1000)
 
-\subsubsection{symulowane wyżarzanie ver. 1 - T=250}
+\subsection{symulowane wyżarzanie ver. 1 - T=250}
 Maksymalny zysk : 113 543.61\\
 Minimalny zysk: 106 634.53\\
 Średni zysk : 109 589.07\\
@@ -321,7 +321,7 @@ Minimalny zysk: 106 634.53\\
 \end{figure}
 
 
-\subsubsection{symulowane wyżarzanie ver. 1 - T=500}
+\subsection{symulowane wyżarzanie ver. 1 - T=500}
 Maksymalny zysk : 113 435.884\\
 Minimalny zysk: 107 481.54\\
 Średni zysk : 111 440.51\\
@@ -334,7 +334,7 @@ Minimalny zysk: 107 481.54\\
 \end{figure}
 
 
-\subsubsection{symulowane wyżarzanie ver. 1 - T=1000}
+\subsection{symulowane wyżarzanie ver. 1 - T=1000}
 Maksymalny zysk : 114 592.91\\
 Minimalny zysk: 112 150.77\\
 Średni zysk : 113 364.59\\
@@ -349,7 +349,7 @@ Minimalny zysk: 112 150.77\\
 \end{figure}
 
 
-\subsubsection{symulowane wyżarzanie ver. 2 - T=250}
+\subsection{symulowane wyżarzanie ver. 2 - T=250}
 Maksymalny zysk :  113 566.25 \\
 Minimalny zysk: 104 620.12 \\
 Średni zysk : 107 846.09 \\
@@ -362,7 +362,7 @@ Minimalny zysk: 104 620.12 \\
 \end{figure}
 
 
-\subsubsection{symulowane wyżarzanie ver. 2 - T=500}
+\subsection{symulowane wyżarzanie ver. 2 - T=500}
 Maksymalny zysk : 111 502.28 \\
 Minimalny zysk: 104 643.50 \\
 Średni zysk : 108 609.50 \\
@@ -375,7 +375,7 @@ Minimalny zysk: 104 643.50 \\
 \end{figure}
 
 
-\subsubsection{symulowane wyżarzanie ver. 2 - T=1000}
+\subsection{symulowane wyżarzanie ver. 2 - T=1000}
 Maksymalny zysk : 111 098.25 \\
 Minimalny zysk: 103 641.16 \\
 Średni zysk : 106 994.41 \\
@@ -387,10 +387,10 @@ Minimalny zysk: 103 641.16 \\
 	\label{fig:anneallingv21000}
 \end{figure}
 
-\subsubsection{Genetic algorithm - roullet}
+\subsection{Genetic algorithm - roulette}
 Maksymalny zysk : 115 107.46 \\
 Minimalny zysk: 114 060.89 \\
-Średni zysk : 114 630.24
+Średni zysk : 114 630.24\\
 
 \begin{figure}[H]
 	\centering
@@ -401,10 +401,10 @@ Minimalny zysk: 114 060.89 \\
 
 
 
-\subsubsection{Genetic algorithm - rank selection}
+\subsection{Genetic algorithm - rank selection}
 Maksymalny zysk : 115107.46\\
 Minimalny zysk: 113 566.25 \\
-Średni zysk : 114 665.48
+Średni zysk : 114 665.48\\
 
 \begin{figure}[H]
 	\centering
@@ -412,6 +412,83 @@ Minimalny zysk: 113 566.25 \\
 	\caption{Przykładowy wykres rozwiązań}
 	\label{fig:rank}
 \end{figure}
+
+
+\section{Testy - przypadek ze złymi warunkami}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/macierz_zlych_przypadkow}
+	\caption{}
+	\label{fig:macierzzlychprzypadkow}
+\end{figure}
+
+
+\subsection{annealing v1 - temperatura=1000}
+Maksymalny zysk : 75 767.88\\
+Minimalny zysk: 59 471.75 \\
+Średni zysk : 70 873.31
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/annealing_v1_zlych_przypadkow}
+	\caption{}
+	\label{fig:annealingv1zlychprzypadkow}
+\end{figure}
+
+
+\subsection{annealing v2 - temperatura=1000}
+Maksymalny zysk : 71 395.16\\
+Minimalny zysk: 66 062.65 \\
+Średni zysk : 68 839.12
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/annealing_v2_zlych_przypadkow}
+	\caption{}
+	\label{fig:annealingv2zlychprzypadkow}
+\end{figure}
+
+
+\subsection{genetic rank i roulette}
+
+Genetic - rank selection\\
+Min: 78 778.63\\
+Max: 78 778.63\\
+Średnia : 78 778.63\\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/genetic_rank_zlych_przypadkow}
+	\caption{Genetyczny - rankingowy}
+	\label{fig:geneticrankzlychprzypadkow}
+\end{figure}
+
+
+Genetic - roulette selection\\
+Min: 78 778.63\\
+Max: 78 778.63\\
+Średnia : 78 778.63\\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/genetic_roulet_zlych_przypadkow}
+	\caption{Genetyczny - ruletkowy}
+	\label{fig:geneticrouletzlychprzypadkow}
+\end{figure}
+
+Obie wersje genetycznego nie zmieniają wyniku dla takiej macierzy początkowej.
+
+
+\subsection{greedy}
+
+Min: 55 084.45\\
+Max: 55 084.45\\
+Średnia : 55 084.45\\
+
+Dla porównania wyniki algorytmu zachłannego
+
+
 
 
 \section{Problemy}
