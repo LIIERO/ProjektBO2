@@ -1,12 +1,5 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
-
-
-
-
-\documentclass[12pt,a4paper]
-
-\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{makeidx}
@@ -26,9 +19,30 @@
 \usepackage{color}
 
 
+\renewcommand\lstlistingname{Quelltext}
+\lstset{ % General setup for the package
+	language=Python,
+	basicstyle=\small\sffamily,
+	numbers=left,
+	numberstyle=\tiny,
+	frame=tb,
+	tabsize=4,
+	columns=fixed,
+	showstringspaces=false,
+	showtabs=false,
+	keepspaces,
+	commentstyle=\color{red},
+	keywordstyle=\color{blue}
+}
+
+
+
+\begin{document}
+
 \begin{center}
-    \includegraphics[width=75mm]{field.jpg}
+    \includegraphics[width=75mm]{screens/field.jpg}
 \end{center}
+
 \newcommand{\AASprTab}[5]{
 
 
@@ -73,27 +87,7 @@
 \end{center}
 }
 
-\renewcommand\lstlistingname{Quelltext}
 
-\lstset{ % General setup for the package
-	language=Python,
-	basicstyle=\small\sffamily,
-	numbers=left,
-	numberstyle=\tiny,
-	frame=tb,
-	tabsize=4,
-	columns=fixed,
-	showstringspaces=false,
-	showtabs=false,
-	keepspaces,
-	commentstyle=\color{red},
-	keywordstyle=\color{blue}
-}
-
-
-
-
-\begin{document}
 
 \AASprTab { tabela1 }{1 stycznia 2022 r.}{Bartłomiej Matuszewski}{Piotr Mamos}{Dawid Maziarski}
 
@@ -310,6 +304,114 @@ Z uwagi że na to że w rzeczywistości algorytm genetyczny wywoływany jest z o
 
 \section{Aplikacja}
 W ramach realizacji naszego projektu zrealizowaliśmy również proste GUI pozwalające w wygodny sposób użytkownikowi korzystać z naszego programu. Aby go uruchomić trzeba mieć pobraną i wypakowaną naszą aplikację, następnie uruchomić $FieldSimulation.exe$ . W ten sposób uruchomi się nam program w okienku oraz konsola. Konsola ta jest tylko do przedstawiania macierzy wynikowych oraz numerów najlepszych generacji z algorytmów genetycznych, jest to więc nie interaktywne narzędzie pomocnicze na które użytkownik nie musi zwracać uwagi jeśli interesują go tylko uzyskany zysk. W wspomnianym już okienku  ustalamy liczbę lat oraz pól które chcemy przesymulować, możemy również wybrać wcześniej przygotowany przypadek domyślny. Jeśli jednak chcemy zadeklarować własne parametry gospodarstwa to klikamy przycisk kontynuuj, wtedy ukazuje się nowe okienko w którym możemy wpisać powierzchnie każdego pola, dystans od gospodarstwa oraz początkową jakość ziemi. Możemy te pola wypełnić samemu lub wylosować, następnie musimy kliknąć ponownie przycisk kontynuuj. Wtedy ukaze nam się ostateczne okno w którym wybieramy jedną z metod symulacji, ustalamy temperature maksymalną dla metody wyżarzania . Możemy tam w górnym prawym rogu obserwować uzyskany zysk dla każdej z metod. Dla metod wyżarzania oraz algorytmów możemy wyświetlić również przebeg rozwiązania za pomocą przycisku w dolnej części okna, ukaże nam się wtedy dodatkowe okienko w którym będziemy mogli dokładnie przyjrzeć się przebiegowi. W  GUI nie udostępniliśmy możliwości zmiany ilości generacji czy liczby chromosomów (powody te opisaliśmy w akapicie dotyczącym algorytmu genetycznego), jeśli jednak użytkownik jest przekonany że chce zmienić te parametry może to zrobić wchodząc w przesłane pliki programu, a następnie otworzyć plik $GUI.py$ i w linijkach 286 oraz 303 powinny znajdować się zmienne ($generation_quantities$ oraz $amount_chromoses$) które decydują o tych parametrach.
+
+\subsection{testy}
+Każdy algorytm został puszczony 10-krotnie (w przypadku wyżarzania dla temperatur 250, 500, 1000)
+
+\subsubsection{symulowane wyżarzanie ver. 1 - T=250}
+Maksymalny zysk : 113 543.61\\
+Minimalny zysk: 106 634.53\\
+Średni zysk : 109 589.07\\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/AnneallingV1_250}
+	\caption{Przykładowy wykres rozwiązań dla T = 250}
+	\label{fig:anneallingv1250}
+\end{figure}
+
+
+\subsubsection{symulowane wyżarzanie ver. 1 - T=500}
+Maksymalny zysk : 113 435.884\\
+Minimalny zysk: 107 481.54\\
+Średni zysk : 111 440.51\\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/AnneallingV1_500}
+	\caption{Przykładowy wykres rozwiązań dla T = 500}
+	\label{fig:anneallingv1500}
+\end{figure}
+
+
+\subsubsection{symulowane wyżarzanie ver. 1 - T=1000}
+Maksymalny zysk : 114 592.91\\
+Minimalny zysk: 112 150.77\\
+Średni zysk : 113 364.59\\
+
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/AnneallingV1_1000}
+	\caption{Przykładowy wykres rozwiązań dla T = 1000}
+	\label{fig:anneallingv11000}
+\end{figure}
+
+
+\subsubsection{symulowane wyżarzanie ver. 2 - T=250}
+Maksymalny zysk :  113 566.25 \\
+Minimalny zysk: 104 620.12 \\
+Średni zysk : 107 846.09 \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/AnneallingV2_250}
+	\caption{Przykładowy wykres rozwiązań dla T = 250}
+	\label{fig:anneallingv2250}
+\end{figure}
+
+
+\subsubsection{symulowane wyżarzanie ver. 2 - T=500}
+Maksymalny zysk : 111 502.28 \\
+Minimalny zysk: 104 643.50 \\
+Średni zysk : 108 609.50 \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/AnneallingV2_500}
+	\caption{Przykładowy wykres rozwiązań dla T = 500}
+	\label{fig:anneallingv2500}
+\end{figure}
+
+
+\subsubsection{symulowane wyżarzanie ver. 2 - T=1000}
+Maksymalny zysk : 111 098.25 \\
+Minimalny zysk: 103 641.16 \\
+Średni zysk : 106 994.41 \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/AnneallingV2_1000}
+	\caption{Przykładowy wykres rozwiązań dla T = 1000}
+	\label{fig:anneallingv21000}
+\end{figure}
+
+\subsubsection{Genetic algorithm - roullet}
+Maksymalny zysk : 115 107.46 \\
+Minimalny zysk: 114 060.89 \\
+Średni zysk : 114 630.24
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/ruletka}
+	\caption{Przykładowy wykres rozwiązań}
+	\label{fig:ruletka}
+\end{figure}
+
+
+
+\subsubsection{Genetic algorithm - rank selection}
+Maksymalny zysk : 115107.46\\
+Minimalny zysk: 113 566.25 \\
+Średni zysk : 114 665.48
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{screens/rank.png}
+	\caption{Przykładowy wykres rozwiązań}
+	\label{fig:rank}
+\end{figure}
 
 
 \section{Problemy}

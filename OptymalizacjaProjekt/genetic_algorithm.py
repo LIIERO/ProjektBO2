@@ -89,8 +89,8 @@ class Genetic(object):
         """
         self.chromosome.sort(key=lambda x: x[-1])  # sortowanie chromosomów w danej generacji
 
-        if self.best_chromosome[-1] < self.chromosome[-1][
-            -1]:  # sprawdzenie czy najlepszy z chromosomów w danej generacji jest najlepszy w całej populacji
+        # sprawdzenie czy najlepszy z chromosomów w danej generacji jest najlepszy w całej populacji
+        if self.best_chromosome[-1] < self.chromosome[-1][-1]:
             self.best_chromosome = deepcopy(self.chromosome[-1])
             self.best_generation_number = generation_number
 
@@ -98,7 +98,7 @@ class Genetic(object):
 
         return chromosomes[-1], chromosomes[-2]  # wybór dwóch najlepszych wyników
 
-    def selection_roulette(self, generation_number):  #
+    def selection_roulette(self, generation_number):
         """selekcja metodą ruletki
 
         :param generation_number:
@@ -148,6 +148,7 @@ class Genetic(object):
 
     def crossover(self, selection, selection_type, number_chromosome):
         """procedura krzyżowania
+        sama funkcja jest podzielona dla crossovera ruletkowego i rankingowego
 
         :param selection:
         :param selection_type:
@@ -221,8 +222,8 @@ class Genetic(object):
                         children.append(deepcopy(sel_out[2 * m+1]))
         return children
 
-    def mutation(self, crossover):  # procedura mutacji
-        """
+    def mutation(self, crossover):  #
+        """procedura mutacji
 
         :param crossover:
         :return:
@@ -347,7 +348,20 @@ class Genetic(object):
         return earnings
 
 
-def genetic_algorithm(farm: farm_simulation.FarmSimulation, plants, number_chromosome, selection_type="roulette", generation_quantity = 50):
+def genetic_algorithm(farm: farm_simulation.FarmSimulation,
+                      plants,
+                      number_chromosome,
+                      selection_type="roulette",
+                      generation_quantity: int = 50):
+    """
+
+    :param farm:
+    :param plants:
+    :param number_chromosome:
+    :param selection_type:
+    :param generation_quantity:
+    :return:
+    """
     greedy_result = farm.solve_greedy()  # rozwiązanie konstrukcyjne
 
     farm.earnings = 0
