@@ -1,8 +1,8 @@
-
 import sys
 # from PyQt5.QtWidgets import QApplication, QStackedWidget
 from PyQt5.QtGui import QIcon
 from GUI import app, widget, okno_init, okno_init2, okno
+
 
 def main():
     # Symulacja
@@ -17,6 +17,7 @@ def main():
 
     widget.show()
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()
