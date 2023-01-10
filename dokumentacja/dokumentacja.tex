@@ -5,6 +5,7 @@
 \usepackage{makeidx}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{tabularx}
 \usepackage[width=17.00cm, height=24.00cm]{geometry}
 \usepackage[polish]{babel}
 \usepackage{fixltx2e}
@@ -40,7 +41,7 @@
 \begin{document}
 
 \begin{center}
-    \includegraphics[width=75mm]{screens/field.jpg}
+    \includegraphics[width=75mm]{field.jpg}
 \end{center}
 
 \newcommand{\AASprTab}[5]{
@@ -180,10 +181,10 @@ W ramach implementacji postaci rozwiązania natkneliśmy się na
 \subsection{Algorytm zachłanny}
 Jako pierwszy algorytm zaimplementowaliśmy prosty algorytm zachłanny (funkcja:\begin{verbatim} solve_greedy \end{verbatim}), wybierający w każdym roku dla każdego pola rośline najbardziej dochodową. Implementacja tego algorytmu uświadomiła nam kilka nieścisłości w naszym pierwotnym modelu, które natychmiast zaktualizowaliśmy, takie jak między innymi problem w postaci niemożności traktowania ugoru jak jednego z roślin. Algorytm ten mimo swojej koncepcyjnej prostoty daje najczęściej dość dobre rezultaty. Okazał on się również przydatny przy implementacji innych metod jako algorytm konstrukcyjny zwracający nam rozwiązanie pierwotne oraz jako punkt odniesienia do innych metod.
 
-\subsection{symulowane wyżarzanie}
+\subsection{Symulowane wyżarzanie}
 Nasz problem, na podstawie sugestii pani Profesor postanowiliśmy spróbować rozwiązać również zz pomocą  symulowanego wyżarzania (z ang. simulated anealling), który jest metaherystyką inspirowaną zjawiskami obserwowalnymi w metarurgii, dlatego charakteryzuje się występowaniem parametru sterującego (temperatury). Zastosowanie takiego parametru pozwala nam na przyjęcie gorszego rozwiązania (jeśli w danej epoce nie ma rozwiązania lepszego) zgodnie z rozkładem Boltzmanna (im niższa temperatura tym mniejsze prawdopodobieństwo przyjęcia gorszego rozwiązania), ma to na celu umożliwienie wyjścia z maksimum lokalnego. Z uwagi na to iż jest to technika projektowania algorytmów heurystycznych, ustaliliśmy że zaimplementujemy je w dwóch wersjach.
 Poniżej przedstawiamy prosty pseudokod obrazujący główne założenia symulowanego wyżarzania:
-\newpage
+\newline
 
 \begin{algorithmic}
 \Function{SimulatedAnnealingMax}{$ $}
@@ -270,7 +271,7 @@ Ograniczeniem algorytmów genetycznych jest losowość, która jest ich istotną
 
 \begin{figure}[h]
         \centering
-        \includegraphics[width=0.6\textwidth]{screens/genetic_pseudocode.png}
+        \includegraphics[width=0.6\textwidth]{genetic_pseudocode.png}
         \label{fig:paneloperatorski}
 \end{figure}
 \newpage
@@ -305,7 +306,7 @@ Z uwagi że na to że w rzeczywistości algorytm genetyczny wywoływany jest z o
 \section{Aplikacja}
 W ramach realizacji naszego projektu zrealizowaliśmy również proste GUI pozwalające w wygodny sposób użytkownikowi korzystać z naszego programu. Aby go uruchomić trzeba mieć pobraną i wypakowaną naszą aplikację, następnie uruchomić $FieldSimulation.exe$ . W ten sposób uruchomi się nam program w okienku oraz konsola. Konsola ta jest tylko do przedstawiania macierzy wynikowych oraz numerów najlepszych generacji z algorytmów genetycznych, jest to więc nie interaktywne narzędzie pomocnicze na które użytkownik nie musi zwracać uwagi jeśli interesują go tylko uzyskany zysk. W wspomnianym już okienku  ustalamy liczbę lat oraz pól które chcemy przesymulować, możemy również wybrać wcześniej przygotowany przypadek domyślny. Jeśli jednak chcemy zadeklarować własne parametry gospodarstwa to klikamy przycisk kontynuuj, wtedy ukazuje się nowe okienko w którym możemy wpisać powierzchnie każdego pola, dystans od gospodarstwa oraz początkową jakość ziemi. Możemy te pola wypełnić samemu lub wylosować, następnie musimy kliknąć ponownie przycisk kontynuuj. Wtedy ukaze nam się ostateczne okno w którym wybieramy jedną z metod symulacji, ustalamy temperature maksymalną dla metody wyżarzania . Możemy tam w górnym prawym rogu obserwować uzyskany zysk dla każdej z metod. Dla metod wyżarzania oraz algorytmów możemy wyświetlić również przebeg rozwiązania za pomocą przycisku w dolnej części okna, ukaże nam się wtedy dodatkowe okienko w którym będziemy mogli dokładnie przyjrzeć się przebiegowi. W  GUI nie udostępniliśmy możliwości zmiany ilości generacji czy liczby chromosomów (powody te opisaliśmy w akapicie dotyczącym algorytmu genetycznego), jeśli jednak użytkownik jest przekonany że chce zmienić te parametry może to zrobić wchodząc w przesłane pliki programu, a następnie otworzyć plik $GUI.py$ i w linijkach 286 oraz 303 powinny znajdować się zmienne ($generation_quantities$ oraz $amount_chromoses$) które decydują o tych parametrach.
 
-\section{testy}
+\section{Testy}
 Każdy algorytm został puszczony 10-krotnie (w przypadku wyżarzania dla temperatur 250, 500, 1000)
 
 \subsection{symulowane wyżarzanie ver. 1 - T=250}
@@ -315,7 +316,7 @@ Minimalny zysk: 106 634.53\\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/AnneallingV1_250}
+	\includegraphics[width=0.7\linewidth]{AnneallingV1_250}
 	\caption{Przykładowy wykres rozwiązań dla T = 250}
 	\label{fig:anneallingv1250}
 \end{figure}
@@ -328,7 +329,7 @@ Minimalny zysk: 107 481.54\\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/AnneallingV1_500}
+	\includegraphics[width=0.7\linewidth]{AnneallingV1_500}
 	\caption{Przykładowy wykres rozwiązań dla T = 500}
 	\label{fig:anneallingv1500}
 \end{figure}
@@ -343,7 +344,7 @@ Minimalny zysk: 112 150.77\\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/AnneallingV1_1000}
+	\includegraphics[width=0.7\linewidth]{AnneallingV1_1000}
 	\caption{Przykładowy wykres rozwiązań dla T = 1000}
 	\label{fig:anneallingv11000}
 \end{figure}
@@ -355,7 +356,7 @@ Max: 114566.36\\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/annealing_v1_10000}
+	\includegraphics[width=0.7\linewidth]{annealing_v1_10000}
 	\caption{Przykładowy wykres rozwiązań dla T = 10 000}
 	\label{fig:annealingv110000}
 \end{figure}
@@ -369,7 +370,7 @@ Minimalny zysk: 104 620.12 \\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/AnneallingV2_250}
+	\includegraphics[width=0.7\linewidth]{AnneallingV2_250}
 	\caption{Przykładowy wykres rozwiązań dla T = 250}
 	\label{fig:anneallingv2250}
 \end{figure}
@@ -382,7 +383,7 @@ Minimalny zysk: 104 643.50 \\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/AnneallingV2_500}
+	\includegraphics[width=0.7\linewidth]{AnneallingV2_500}
 	\caption{Przykładowy wykres rozwiązań dla T = 500}
 	\label{fig:anneallingv2500}
 \end{figure}
@@ -395,7 +396,7 @@ Minimalny zysk: 103 641.16 \\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/AnneallingV2_1000}
+	\includegraphics[width=0.7\linewidth]{AnneallingV2_1000}
 	\caption{Przykładowy wykres rozwiązań dla T = 1000}
 	\label{fig:anneallingv21000}
 \end{figure}
@@ -409,7 +410,7 @@ Max: 111 660.63\\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/annealing_v2_10000}
+	\includegraphics[width=0.7\linewidth]{annealing_v2_10000}
 	\caption{Przykładowy wykres rozwiązań dla T = 10 000}
 	\label{fig:annealingv210000}
 \end{figure}
@@ -422,7 +423,7 @@ Minimalny zysk: 114 060.89 \\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/ruletka}
+	\includegraphics[width=0.7\linewidth]{ruletka}
 	\caption{Przykładowy wykres rozwiązań}
 	\label{fig:ruletka}
 \end{figure}
@@ -436,7 +437,7 @@ Minimalny zysk: 113 566.25 \\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/rank.png}
+	\includegraphics[width=0.7\linewidth]{rank.png}
 	\caption{Przykładowy wykres rozwiązań}
 	\label{fig:rank}
 \end{figure}
@@ -446,7 +447,7 @@ Minimalny zysk: 113 566.25 \\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/macierz_zlych_przypadkow}
+	\includegraphics[width=0.7\linewidth]{macierz_zlych_przypadkow}
 	\caption{}
 	\label{fig:macierzzlychprzypadkow}
 \end{figure}
@@ -459,7 +460,7 @@ Minimalny zysk: 59 471.75 \\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/annealing_v1_zlych_przypadkow}
+	\includegraphics[width=0.7\linewidth]{annealing_v1_zlych_przypadkow}
 	\caption{}
 	\label{fig:annealingv1zlychprzypadkow}
 \end{figure}
@@ -472,7 +473,7 @@ Minimalny zysk: 66 062.65 \\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/annealing_v2_zlych_przypadkow}
+	\includegraphics[width=0.7\linewidth]{annealing_v2_zlych_przypadkow}
 	\caption{}
 	\label{fig:annealingv2zlychprzypadkow}
 \end{figure}
@@ -487,7 +488,7 @@ Max: 78 778.63\\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/genetic_rank_zlych_przypadkow}
+	\includegraphics[width=0.7\linewidth]{genetic_rank_zlych_przypadkow}
 	\caption{Genetyczny - rankingowy}
 	\label{fig:geneticrankzlychprzypadkow}
 \end{figure}
@@ -500,7 +501,7 @@ Max: 78 778.63\\
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{screens/genetic_roulet_zlych_przypadkow}
+	\includegraphics[width=0.7\linewidth]{genetic_roulet_zlych_przypadkow}
 	\caption{Genetyczny - ruletkowy}
 	\label{fig:geneticrouletzlychprzypadkow}
 \end{figure}
@@ -542,37 +543,73 @@ Niestety, algorytm genetyczny przy tej selekcji nie działa i wyrzuca błąd:
 \subsection{Genetyczny - selekcja rankingowa}
 Wynik: 906.63
 
+\subsection{Bardzo zły przypadek}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{bad_very_bad_matrix}
+	\caption{}
+	\label{fig:badverybadmatrix}
+\end{figure}
+
+\subsubsection{symulowane wyżarzanie V1 i V2  - T = 1000}
+Wynik: 346.42
+
+\subsubsection{Genetyczny - selekcja ruletkowa}
+Niestety, algorytm genetyczny przy tej selekcji nie działa i wyrzuca błąd:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{error_roullette}
+	\caption{}
+	\label{fig:errorroullette}
+\end{figure}
+
+
+\subsubsection{Genetyczny - selekcja rankingowa}
+Wynik: 906.63
 
 \section{Podsumowanie}
 \subsection{Podsumowanie każdej z metod (Wnioski)}
-Każda z zaimplementowanych metod daje zadowalająco dobre wyniki. Algorytm zachłanny z uwagi na swoją naiwność oraz prostote najczęściej daje najgorsze wyniki (dla niewielkich problemów, daję czasem identyczne wyniki jak inne metody), szczególnie skuteczność ta jest zależna od liczby symulowanych lat. Ten prosty algorytm zchłannyc sprawdził się również w roli rozwiązania konstrukcyjnego dla kolejnych metod. Podsumowując metoda ta będzie się sprawdzać dla w miarę liniowych problemów, gdzie w rzeczywistości nie będzie potrzeby implementowania innych metod , z uwagi na intuicyjność i skuteczność algorytmu zachłąnnego. W przypadku wyżarzania w wersji pierwszej zgodnie z przypuszczeniami dla domyślnego rozmiaru problemu wraz z wzrostem temperatury początkowej do wartośći 1000 dostajemy co raz lepsze wyniki, jednak z uwagi na sposób implementacji rozkładu Boltzmanna od tej temperatury średni wynik działania algorytmu staje się gorszy, ponieważ działanie programu jest bardziej losowe. Jednak dla problemów większych (np.10x10) wzrost temperatury do 10 000 stopnii znacznie poprawia skuteczność metody. Tak więc dla pierwszego rodzaju wyżarzania zauważamy że temperaturę początkową należy dobrać do rozmiaru rozważanego problemu.  Dla drugiej wersji dla domyślnych parametrów problemu rzadziej wybiera gorszy wynik, co prowadzi do tego że cześciej zatrzymuje się w maksimach lokalnych dlatego daję bardziej różnorodne wyniki dla tych samych parametrów (najczęściej gorsze niż dla wersji 1), zauważalne jest także że wzrost temperatury nie ma dużego wpływu na końcowy wynik. Jednak dla problemów większych (np. 10 x 10) metoda ta nie tylko daję zauważalnie wyższe wyniki niż wersja pierwsza dla tych samych parametrów oraz widać że wyniki te są proporcjonalne do temperatury. Algorytm zachowuję przy tym jednak zawsze swoją tendencję do nie wybierania gorszych rozwiązań dla wyższych temeratur (co może wskazywać na błąd popełniony podczas implementacji, a samo polepszenie wyników na zależące tylko od liczby wykonanych iteracji i przeanalizowanych przypadków). Algorytm w wersji 2 wykonuję się dla większych problemów zauważalnie dłużej niż w wersji 1, co spowodowane jest najprawdopodobniej większą liczbą iteracji. Podsumowując oba algorytmy bazujące na metodzie wyżarzania dają całkiem zadowalające wyniki i sprawdzają się dla problemów takich jak nasz (mimo popełnionych błędów implementacyjnych), problemem jednak jaki może powstać podczas stosowania tej metody jest określenie rozwiązania sąsiedniego do pierwotnego oraz ograniczenie w prosty sposób tej metody by nie dobierała rozwiązań zabronionych. Algorytmy genetyczne dla obu implementacji są najbardziej skomplikowanymi metodami z przez nasz użytych, co przekłada się również na czas wykonywania całego programu, jednak dostajemy przy tym średnio najlepsze wyniki.  Dla domyślnych parametrów obie te wersje dają uśredniając podobne wyniki, przy czym dzięki wykresą wiemy że selekcja metodą ruletki daję bardzo losowe wyniki, dlatego potrafi poprawić się w każdej z iteracji, z koleji selekcja rankingowa najczęsciej utrzymuje się wokół rozwiązania dotychczas najlepszego przy czym otrzymuje najlepsze wynik wcześniej niż druga wersja. Dla problemów większych (np.10x10) widać jednak zdecydowaną przewagę selekcji rankingowej gdzie selekcja ruletką daje wyniki nie wiele lepsze niż wyżarzanie , a  metoda rankingowa daje znacznie wyższe wyniki, przy czym metoda rankingowa cechuje się małym rozrzutem uzyskanych wyników. Trzeba jednak przyznać że oba algorytmy genetyczne w naszej implementacji nie potrafią poradzić sobię z najbardziej perfidnymi przypadkami (mała jakość pól, mała jakość ziemi, duża odległość od pól), jest to najprawdopodobniej spowodowane zastosowanymi w ich wnętrzu ograniczeniami, które jednak są niezbędne do otrzymywania poprawnych wyników dla innych przypadków. Podsumowując algorytmy te sprawdziły się najlepiej z zastosowanych przez nasz metod, przy czym jednak ich implementacja sprawiła najwięcej problemów (które niestety jak widać nie zostały w pełni usunięte) , a samo ich działanie zajmują w stosunku do innych metod dużo czasu.
+Każda z zaimplementowanych metod daje zadowalająco dobre wyniki.
+\\\\Algorytm zachłanny z uwagi na swoją naiwność oraz prostote najczęściej daje najgorsze wyniki (dla niewielkich problemów, daje czasem identyczne wyniki jak inne metody), szczególnie skuteczność ta jest zależna od liczby symulowanych lat. Ten prosty algorytm sprawdził się również w roli rozwiązania konstrukcyjnego dla kolejnych metod. Podsumowując metoda ta będzie się sprawdzać dla w miarę liniowych problemów, gdzie w rzeczywistości nie będzie potrzeby implementowania innych metod, z uwagi na jego intuicyjność i skuteczność.
+\\\\W przypadku wyżarzania w wersji pierwszej zgodnie z przypuszczeniami dla domyślnego rozmiaru problemu wraz z wzrostem temperatury początkowej do wartośći 1000 dostajemy co raz lepsze wyniki, jednak dla temperatur wyższych niż 1000 z uwagi na sposób implementacji rozkładu Boltzmanna średni wynik działania algorytmu staje się gorszy, ponieważ działanie programu jest bardziej losowe. Dla problemów większych (np. 10x10) wzrost temperatury do 10 000 stopnii znacznie poprawia skuteczność metody. Tak więc dla pierwszego rodzaju wyżarzania zauważamy że temperaturę początkową należy dobrać do rozmiaru rozważanego problemu.
+\\\\Druga wersja algorytmu dla domyślnych parametrów problemu rzadziej wybiera gorszy wynik, co prowadzi do tego, że cześciej zatrzymuje się w maksimach lokalnych, dlatego daje bardziej różnorodne wyniki dla tych samych parametrów (najczęściej gorsze niż dla wersji 1). Zauważalne jest także że wzrost temperatury nie ma dużego wpływu na końcowy wynik, jednak dla problemów większych (np. 10x10) metoda ta nie tylko daje zauważalnie wyższe wyniki niż wersja pierwsza dla tych samych parametrów, oraz widać że wyniki te są proporcjonalne do temperatury. Algorytm zachowuje przy tym jednak zawsze swoją tendencję do nie wybierania gorszych rozwiązań dla wyższych temperatur (co może wskazywać na błąd popełniony podczas implementacji, a samo polepszenie wyników na zależące tylko od liczby wykonanych iteracji i przeanalizowanych przypadków). Algorytm w wersji 2 wykonuje się dla większych problemów zauważalnie dłużej niż w wersji 1, co spowodowane jest najprawdopodobniej większą liczbą iteracji. Podsumowując oba algorytmy bazujące na metodzie wyżarzania dają całkiem zadowalające wyniki i sprawdzają się dla problemów takich jak nasz (mimo popełnionych błędów implementacyjnych), problemem jednak jaki może powstać podczas stosowania tej metody jest określenie rozwiązania sąsiedniego do pierwotnego oraz ograniczenie w prosty sposób tej metody by nie dobierała rozwiązań zabronionych.
+\\\\Algorytmy genetyczne dla obu implementacji są najbardziej skomplikowanymi użytymi przez nas metodami, co przekłada się również na czas wykonywania całego programu. Dają one jednak średnio najlepsze wyniki. Dla domyślnych parametrów obie te wersje dają uśredniając podobne wyniki, przy czym dzięki wykresom wiemy, że selekcja metodą ruletki daje bardzo losowe wyniki, dlatego potrafi poprawić się w każdej z iteracji, z koleji selekcja rankingowa najczęsciej utrzymuje się wokół rozwiązania dotychczas najlepszego przy czym otrzymuje najlepsze wyniki wcześniej niż druga wersja. Dla problemów większych (np. 10x10), widać jednak zdecydowaną przewagę selekcji rankingowej (selekcja ruletką daje wyniki niewiele lepsze niż wyżarzanie), daje ona znacznie wyższe wyniki cechując się małym rozrzutem uzyskanych wyników. Trzeba jednak przyznać, że oba algorytmy genetyczne w naszej implementacji nie potrafią poradzić sobię z najbardziej perfidnymi przypadkami (mała jakość pól, mała jakość ziemi, duża odległość od pól); jest to najprawdopodobniej spowodowane zastosowanymi w ich wnętrzu ograniczeniami, które jednak są niezbędne do otrzymywania poprawnych wyników dla innych przypadków. Podsumowując algorytmy te sprawdziły się najlepiej z zastosowanych przez nasz metod, przy czym jednak ich implementacja sprawiła najwięcej problemów (które niestety jak widać nie zostały w pełni usunięte), a samo ich działanie zajmuje w stosunku do innych metod dużo czasu.
 
 \subsection{Potencjalne kierunki rozwoju}
 Problem przez nasz analizowany można daję nam duże pole w zakresie potencjalnych kierunków, najważniejsze przedstawimy poniżej w postaci listy:
 \begin{itemize}
-		\item Rozszerzenie ilości dostępnych roślin
+		\item Rozszerzenie liczby dostępnych roślin.
 
-		\item Umożliwienie uwzględnia metod ekologicznych w uprawach
+		\item Umożliwienie uwzględnienia metod ekologicznych w uprawach.
 
-		\item Danie użytkownikowi możliwości dostosowania kosztów i zysków do jego gospodarstwa ( możliwość ustawienia przewidywanej ceny plonu za jednostkę, ceny zastosowanego materiału siewnego, paliwa, nawozów , przewidywanego plonu dla zastosowanej odmiany itp. )
+		\item Danie użytkownikowi możliwości dostosowania kosztów i zysków do jego gospodarstwa (możliwość ustawienia przewidywanej ceny plonu za jednostkę, ceny zastosowanego materiału siewnego, paliwa, nawozów , przewidywanego plonu dla zastosowanej odmiany itp.)
 
-		\item Uwzględnie większej ilości zależności wpływających na końcowy wynik (np. obostrzeń co do nawożenia czy oprysków dla daneych terenów)
+		\item Uwzględnienie większej liczby zależności wpływających na końcowy wynik (np. obostrzeń co do nawożenia czy oprysków dla danych terenów).
 
 		\item Urealnienie zastosowanej przez nasz jakości ziemi i wpływu roślin na nią (np. ustalenie stałej klasy jakości danego pola, uwzględnienie zawartości składników mineralnych w glebie itp.)
 
-		\item Inne podejście do przekraczania jakości pola, by pojawienie się ujemnego dochodu po zmianie któregoś z pól nie powodowało odrzucenie tego rozwiązania, lecz dostosowanie pozostałej części rozwiązania do tej zmiany (sprowadziłoby się to zapewne do referencyjnego wywołania algorytmu dla odpowiednio okrojonego problemu dla jednego pola dla początkowej jakości ziemi otrzymanej poziom wyżej)
+		\item Inne podejście do ujemnych jakości gleb. Pojawienie się ujemnej jakości gleby po zmianie rośliny na którymś z pól nie powodowało odrzucenia tego rozwiązania, lecz dostosowanie pozostałej części rozwiązania do tej zmiany (sprowadziłoby się to na przykład do rekurencyjnego wywołania algorytmu dla odpowiednio okrojonego problemu dla jednego pola dla początkowej jakości ziemi otrzymanej poziom wyżej).
 
-		\item Zmiana podejścia do sąsiedztwa rozwiązania
+		\item Zmiana definicji sąsiedztwa rozwiązania.
 
-		\item Poprawienie implementacji algorytmów genetycznych by dawały wyniki również dla przypadków najbardziej perfidnych
+		\item Poprawienie implementacji algorytmów genetycznych, by dawały wyniki również dla przypadków najbardziej perfidnych.
 
-		\item Dla algorytmów genetycznych możliwość przekazania części osobników z jednego pokolenia do kolejnego
-            \item Implementacja kolejnych algorytmów rozwiązujących problem
-            \item Możliwość zastosowania materiału siewnego z plonu z poprzedniego roku
-            \item Uwzględnienie produkcji zwierzęcej (odjęcie od planowanego plonu zadanej ilości plonu na rzec zwierząt oraz wprowadzenie specjalnych zaleceń związanych z ich hodowlą np. przymus uprawy jakiejś ilości kukurydzy na kiszonkę w każdym roku)
+		\item Dla algorytmów genetycznych możliwość przekazania części osobników z jednego pokolenia do kolejnego.
+            \item Implementacja kolejnych algorytmów rozwiązujących problem.
+            \item Możliwość zastosowania materiału siewnego z plonu z poprzedniego roku.
+            \item Uwzględnienie produkcji zwierzęcej (odjęcie od planowanego plonu zadanej ilości plonu na rzecz zwierząt oraz wprowadzenie specjalnych zaleceń związanych z ich hodowlą np. przymus uprawy jakiejś ilości kukurydzy na kiszonkę dla zwierząt w każdym roku).
+            \item Możliwość zasiania jednego rodzaju rośliny na jednym polu dwa lata pod rząd stosując przy tym funkcję kary. Zredukowało by to liczbę rozwiązań niedopuszczalnych co mogło by prowadzić do lepszych wyników.
+            \item Modyfikacja algorytmów wyżarzania tak aby wykonywały się osobno na każdym polu (jak w przypadku naszej implementacji algorytmów genetycznych).
 
 	\end{itemize}
+\section{Dodatek}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\linewidth]{tabela8.png}
+	\label{fig:podzialpracy}
+\end{figure}
 
 \end{document}
